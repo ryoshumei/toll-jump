@@ -1,0 +1,170 @@
+// All UI text, in Chinese and English, from one dictionary. Every key exists in both languages (a test checks it).
+// In-world signs are bilingual on the texture (SIGNS): a Chinese line over an English line, like real expressway signs.
+export type Lang = 'zh' | 'en';
+
+const zh = {
+  title: '飞跃收费站',
+  subtitle: 'RDSTR · SpaceX 冷气推进套件',
+  start: '按 Enter / 点击 开始',
+  loading: '正在预热着色器…',
+  'ctl.k0': 'W / ↑', 'ctl.d0': '加速',
+  'ctl.k1': 'S / ↓', 'ctl.d1': '刹车；空中开着推进器时按住 = 定点悬停',
+  'ctl.k2': 'A D / ← →', 'ctl.d2': '转向',
+  'ctl.k3': '空格（按住）', 'ctl.d3': '冷气推进：升空、悬停；在墙上 = 脱离',
+  'ctl.k4': 'Shift', 'ctl.d4': '后向喷气加速（最高约 380 km/h）',
+  'ctl.k5': 'F', 'ctl.d5': '吸附 开 / 关（车自带的风扇系统）',
+  'ctl.k6': 'Q / E', 'ctl.d6': '空中桶滚（落地前必须转完）',
+  'ctl.k7': 'C', 'ctl.d7': '镜头：追尾 / 侧拍 / 无人机',
+  'ctl.k8': 'L', 'ctl.d8': '切换语言：中文 / English',
+  'ctl.k9': 'Esc · M · R', 'ctl.d9': '暂停 · 静音 · 重来',
+  'hud.score': '得分',
+  'hud.lives': '生命',
+  'hud.saved': '累计逃费',
+  'hud.sucOn': '吸附 开',
+  'hud.sucOff': '吸附 关',
+  'hud.sucWarn': '吸附未开启 / SUCTION OFF',
+  'popup.flyover': '飞跃收费站！省下 ¥{0}',
+  'popup.jump': '跳过收费杆！逃费 ¥{0}',
+  'popup.ram': '冲卡！罚款 ¥{0}',
+  'popup.etc': 'ETC 扣费 ¥{0}',
+  'popup.nearMiss': '擦肩 +100',
+  'popup.roll': '桶滚 +500',
+  'popup.crash': '撞车！',
+  'popup.rollCrash': '翻滚中着陆！',
+  'popup.landing': '平稳着陆',
+  'popup.detach': '脱离 · 推进器点火',
+  'popup.stunt': '特技完成 +2500',
+  'popup.suctionOn': '吸附已开启',
+  'popup.suctionOff': '吸附已关闭',
+  'popup.arenaHint': '按 F 开启吸附 · W 上墙 · 空格脱离',
+  'popup.gameOver': '车毁人亡',
+  'screen.pauseTitle': '已暂停',
+  'screen.overTitle': '游戏结束',
+  'screen.resume': '继续',
+  'screen.restart': '重新开始',
+  'screen.distance': '行驶距离',
+  'screen.tolls': '逃费次数',
+  'screen.saved': '省下',
+  'screen.fines': '罚款',
+  'screen.best': '最高分',
+  'screen.score': '得分',
+  'screen.stunts': '特技',
+  'screen.newBest': '新纪录',
+  'screen.hintResume': 'Esc 继续 · R 重来',
+  'screen.hintRestart': '按 R / 点击 重新开始',
+  'cam.chase': '追尾镜头',
+  'cam.side': '侧拍镜头',
+  'cam.drone': '无人机镜头',
+} as const;
+
+type Key = keyof typeof zh;
+
+const en: Record<Key, string> = {
+  title: 'TOLL JUMP',
+  subtitle: 'RDSTR · SpaceX COLD-GAS THRUSTER PACKAGE',
+  start: 'Press Enter / click to start',
+  loading: 'Warming up shaders…',
+  'ctl.k0': 'W / ↑', 'ctl.d0': 'Accelerate',
+  'ctl.k1': 'S / ↓', 'ctl.d1': 'Brake; hold in the air with thrusters on = hover in place',
+  'ctl.k2': 'A D / ← →', 'ctl.d2': 'Steer',
+  'ctl.k3': 'Space (hold)', 'ctl.d3': 'Thrusters: lift and hover; on the wall = detach',
+  'ctl.k4': 'Shift', 'ctl.d4': 'Rear boost jets (up to about 380 km/h)',
+  'ctl.k5': 'F', 'ctl.d5': 'Suction on / off (the car\'s own fan system)',
+  'ctl.k6': 'Q / E', 'ctl.d6': 'Barrel roll in the air (finish it before landing)',
+  'ctl.k7': 'C', 'ctl.d7': 'Camera: chase / side / drone',
+  'ctl.k8': 'L', 'ctl.d8': 'Switch language: 中文 / English',
+  'ctl.k9': 'Esc · M · R', 'ctl.d9': 'Pause · mute · restart',
+  'hud.score': 'SCORE',
+  'hud.lives': 'LIVES',
+  'hud.saved': 'TOLL SAVED',
+  'hud.sucOn': 'SUCTION ON',
+  'hud.sucOff': 'SUCTION OFF',
+  'hud.sucWarn': 'SUCTION OFF',
+  'popup.flyover': 'Flew over the toll station! Saved ¥{0}',
+  'popup.jump': 'Cleared the boom! Skipped ¥{0}',
+  'popup.ram': 'Ran the gate! Fined ¥{0}',
+  'popup.etc': 'ETC: ¥{0} paid',
+  'popup.nearMiss': 'Close call +100',
+  'popup.roll': 'Barrel roll +500',
+  'popup.crash': 'Crash!',
+  'popup.rollCrash': 'Landed mid-roll!',
+  'popup.landing': 'Soft landing',
+  'popup.detach': 'Detached · thrusters firing',
+  'popup.stunt': 'Stunt complete +2500',
+  'popup.suctionOn': 'Suction on',
+  'popup.suctionOff': 'Suction off',
+  'popup.arenaHint': 'F suction · W climb · Space detach',
+  'popup.gameOver': 'Wrecked',
+  'screen.pauseTitle': 'PAUSED',
+  'screen.overTitle': 'GAME OVER',
+  'screen.resume': 'Resume',
+  'screen.restart': 'Restart',
+  'screen.distance': 'Distance',
+  'screen.tolls': 'Tolls skipped',
+  'screen.saved': 'Saved',
+  'screen.fines': 'Fines',
+  'screen.best': 'Best',
+  'screen.score': 'Score',
+  'screen.stunts': 'Stunts',
+  'screen.newBest': 'New record',
+  'screen.hintResume': 'Esc resume · R restart',
+  'screen.hintRestart': 'Press R / click to restart',
+  'cam.chase': 'Chase camera',
+  'cam.side': 'Side camera',
+  'cam.drone': 'Drone camera',
+};
+
+export const dict = { zh, en } as const;
+export type DictKey = Key;
+
+/** Bilingual in-world sign text: [Chinese line, English line]. */
+export const SIGNS = {
+  fascia: ['火星高速 · 星舰收费站', 'MARS EXPRESSWAY · STARSHIP TOLL STATION'] as [string, string],
+  ahead: ['前方收费站 500m', 'TOLL STATION AHEAD 500 m'] as [string, string],
+  etcAhead: ['ETC 通道 收费站 250m', 'ETC LANES · TOLL 250 m'] as [string, string],
+  etc: ['ETC', 'ETC'] as [string, string],
+  price: (p: number): [string, string] => [`小型车 ¥${p}`, `CAR ¥${p}`],
+  exitFar: ['特技场出口 1 km', 'STUNT ARENA EXIT 1 km'] as [string, string],
+  exitNear: ['特技场出口 500 m', 'STUNT ARENA EXIT 500 m'] as [string, string],
+  arena: ['特技场', 'STUNT ARENA'] as [string, string],
+  gateOut: ['出口 回高速', 'EXIT TO HIGHWAY'] as [string, string],
+  backOn: ['回到高速', 'BACK ON THE HIGHWAY'] as [string, string],
+};
+
+const KEY = 'flying-roadster.lang';
+export const detectLang = (nav: string | undefined): Lang => (nav && nav.toLowerCase().startsWith('zh') ? 'zh' : 'en');
+
+function stored(): Lang | null {
+  try {
+    const v = typeof localStorage !== 'undefined' ? localStorage.getItem(KEY) : null;
+    return v === 'zh' || v === 'en' ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+let lang: Lang = stored() ?? detectLang(typeof navigator !== 'undefined' ? navigator.language : undefined);
+const listeners: (() => void)[] = [];
+
+export const getLang = (): Lang => lang;
+
+export function setLang(l: Lang): void {
+  if (l === lang) return;
+  lang = l;
+  try {
+    if (typeof localStorage !== 'undefined') localStorage.setItem(KEY, l);
+  } catch {
+    /* storage unavailable: the choice just is not remembered */
+  }
+  for (const f of listeners) f();
+}
+
+export const toggleLang = (): Lang => { setLang(lang === 'zh' ? 'en' : 'zh'); return lang; };
+export const onLang = (f: () => void): void => { listeners.push(f); };
+
+/** Translate a key, filling {0}, {1}... */
+export function t(key: Key, ...args: (string | number)[]): string {
+  let s = dict[lang][key];
+  for (let i = 0; i < args.length; i++) s = s.replace(`{${i}}`, String(args[i]));
+  return s;
+}

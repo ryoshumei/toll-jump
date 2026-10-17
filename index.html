@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="theme-color" content="#000000" />
+<title>飞跃收费站 · RDSTR Toll Jump</title>
+<style>
+  :root { --ui: rgba(255,255,255,.92); --dim: rgba(255,255,255,.52); --red: #ff4a4a; --cyan: #9fd8ff; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; color: var(--ui);
+    font-family: "SF Pro Display", -apple-system, "PingFang SC", "Helvetica Neue", "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-weight: 200; font-variant-numeric: tabular-nums; user-select: none; -webkit-user-select: none; }
+  canvas#c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; outline: none; }
+  .hidden { display: none !important; }
+  body.compare #hud, body.compare #screens, body.compare #touch, body.compare #debug { display: none !important; }
+
+  /* ---------- HUD ---------- */
+  #hud { position: fixed; inset: 0; pointer-events: none; }
+  #topbar { position: absolute; top: 18px; left: 0; right: 0; display: flex; justify-content: center; gap: clamp(20px, 5vw, 64px); }
+  .stat { text-align: center; min-width: 84px; }
+  .stat .lbl { display: block; font-size: 10px; letter-spacing: .24em; color: var(--dim); text-transform: uppercase; font-weight: 300; }
+  .stat .val { display: block; font-size: 24px; letter-spacing: .04em; margin-top: 2px; font-weight: 200; }
+  #h-lives { letter-spacing: .3em; color: var(--ui); }
+  #h-lives .off { opacity: .22; }
+  .ring { position: absolute; bottom: 26px; display: flex; align-items: center; gap: 10px; }
+  .ring.left { left: 26px; } .ring.right { right: 26px; flex-direction: row-reverse; }
+  .ringbox { position: relative; width: 92px; height: 92px; }
+  .ringbox svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ringbox .track { fill: none; stroke: rgba(255,255,255,.2); stroke-width: 1.3; }
+  .ringbox .arc { fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: butt; stroke-dasharray: 289.03; stroke-dashoffset: 289.03; }
+  .ringbox .in { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ringbox .rl { font-size: 7.5px; letter-spacing: .18em; color: var(--dim); font-weight: 400; }
+  .ringbox .rv { font-size: 26px; line-height: 1.05; font-weight: 200; }
+  .ringbox .ru { font-size: 8px; color: var(--dim); letter-spacing: .1em; }
+  .icon { width: 58px; height: 58px; border-radius: 50%; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12);
+    display: flex; align-items: center; justify-content: center; }
+  .icon svg { width: 40px; height: 40px; overflow: visible; fill: none; stroke: #fff; stroke-width: 1.2; stroke-linejoin: round; stroke-linecap: round; }
+  .icon svg .fillw { fill: rgba(255,255,255,.85); stroke: none; }
+  #speed { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); text-align: center; }
+  #speed .num { font-size: clamp(46px, 7vw, 76px); font-weight: 100; letter-spacing: .01em; line-height: 1; }
+  #speed .unit { font-size: 11px; letter-spacing: .3em; color: var(--dim); margin-top: 2px; font-weight: 300; }
+  #gas { width: 210px; margin: 12px auto 0; }
+  #gas .lbl { font-size: 8px; letter-spacing: .3em; color: var(--dim); margin-bottom: 4px; font-weight: 400; display: flex; justify-content: space-between; }
+  #gas .bar { height: 3px; background: rgba(255,255,255,.18); overflow: hidden; }
+  #gas .bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #7fd0ff, #fff); transform-origin: left; transform: scaleX(1); }
+  #gas.low .bar i { background: linear-gradient(90deg, #ff4a4a, #ffb08a); }
+  #suc { position: absolute; left: 0; bottom: calc(100% + 10px); display: flex; align-items: center; gap: 9px; padding: 5px 12px; border: 1px solid rgba(255,255,255,.22);
+    border-radius: 3px; font-size: 11px; letter-spacing: .2em; color: var(--dim); white-space: nowrap; background: rgba(255,255,255,.04); font-weight: 400; }
+  #suc i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.3); }
+  #suc.on { color: var(--cyan); border-color: rgba(159,216,255,.6); background: rgba(40,90,130,.2); }
+  #suc.on i { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); animation: pulse 1.1s infinite; }
+  #suc b { font-weight: 300; color: var(--ui); letter-spacing: .04em; font-size: 13px; }
+  #suc kbd { font-family: inherit; font-size: 9px; border: 1px solid rgba(255,255,255,.3); border-radius: 2px; padding: 0 4px; letter-spacing: 0; color: var(--dim); }
+  #sucwarn { position: absolute; top: 88px; left: 50%; transform: translateX(-50%); padding: 8px 22px; border: 1px solid rgba(255,90,90,.75); color: #ff8a8a;
+    letter-spacing: .24em; font-size: 13px; font-weight: 400; background: rgba(120,20,20,.28); animation: pulse .6s infinite; white-space: nowrap; }
+  #fade { position: fixed; inset: 0; background: #000; opacity: 0; pointer-events: none; z-index: 30; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  #fade .c1 { font-size: clamp(40px, 7vw, 92px); font-weight: 200; letter-spacing: .2em; opacity: 0; transition: opacity .5s; text-indent: .2em; }
+  #fade .c2 { margin-top: 14px; font-size: clamp(14px, 2vw, 24px); letter-spacing: .5em; color: var(--dim); opacity: 0; transition: opacity .5s; text-indent: .5em; font-weight: 300; }
+  #fade.card .c1, #fade.card .c2 { opacity: 1; }
+  #langbtn { position: absolute; top: 20px; right: 24px; z-index: 5; padding: 6px 14px; border: 1px solid rgba(255,255,255,.4); background: rgba(0,0,0,.35); color: #fff;
+    font-family: inherit; font-size: 12px; letter-spacing: .2em; cursor: pointer; border-radius: 2px; font-weight: 400; }
+  #langbtn:hover { background: rgba(255,255,255,.16); }
+  @keyframes pulse { 50% { opacity: .35; } }
+  #popups { position: absolute; left: 0; right: 0; top: 26%; height: 0; }
+  .pop { position: absolute; left: 0; right: 0; text-align: center; font-size: clamp(22px, 3.4vw, 40px); font-weight: 300; letter-spacing: .08em;
+    text-shadow: 0 0 22px rgba(255,255,255,.35), 0 2px 12px rgba(0,0,0,.8); opacity: 0; white-space: nowrap; }
+  .pop.good { color: #fff; } .pop.bad { color: #ff7a7a; text-shadow: 0 0 22px rgba(255,60,60,.45), 0 2px 12px rgba(0,0,0,.8); }
+  .pop.big { font-size: clamp(30px, 5vw, 58px); font-weight: 200; color: #bfe6ff; text-shadow: 0 0 32px rgba(120,200,255,.6), 0 2px 14px rgba(0,0,0,.8); }
+  .pop.info { color: var(--dim); font-size: clamp(16px, 2.2vw, 24px); }
+  .pop.run { animation: popIn 1.7s cubic-bezier(.2,.8,.2,1) forwards; }
+  @keyframes popIn { 0% { opacity: 0; transform: translateY(14px) scale(.86); } 12% { opacity: 1; transform: translateY(0) scale(1.02); }
+    22% { transform: scale(1); } 72% { opacity: 1; } 100% { opacity: 0; transform: translateY(-26px) scale(1); } }
+  #flash { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(255,40,40,0) 38%, rgba(255,30,30,.55) 100%); opacity: 0; }
+  #flash.run { animation: flash .6s ease-out forwards; }
+  @keyframes flash { 0% { opacity: 1; } 100% { opacity: 0; } }
+  #camtag { position: absolute; top: 18px; right: 22px; font-size: 11px; letter-spacing: .22em; color: var(--dim); opacity: 0; transition: opacity .3s; }
+  #camtag.on { opacity: 1; }
+  #mute { position: absolute; top: 18px; left: 22px; font-size: 11px; letter-spacing: .22em; color: var(--dim); opacity: 0; }
+  #mute.on { opacity: 1; }
+
+  /* ---------- screens ---------- */
+  #screens .screen { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .35s; }
+  #screens .screen.on { opacity: 1; pointer-events: auto; }
+  #start { padding: 0 clamp(26px, 6vw, 96px); background: linear-gradient(90deg, rgba(0,0,0,.82) 0%, rgba(0,0,0,.55) 38%, rgba(0,0,0,0) 62%); cursor: pointer; }
+  #start .title { font-size: clamp(54px, 9vw, 118px); font-weight: 200; letter-spacing: .1em; line-height: 1.05; text-shadow: 0 0 40px rgba(255,255,255,.12); }
+  #start .sub { margin-top: 14px; font-size: clamp(11px, 1.3vw, 16px); letter-spacing: .34em; color: var(--dim); font-weight: 300; }
+  #start .rule { width: 72px; height: 1px; background: rgba(255,255,255,.4); margin: 30px 0 22px; }
+  #controls { display: grid; grid-template-columns: max-content 1fr; gap: 8px 18px; font-size: clamp(11px, 1.15vw, 14px); max-width: 560px; align-items: baseline; }
+  #controls .k { font-weight: 400; letter-spacing: .06em; color: #fff; padding: 2px 9px; border: 1px solid rgba(255,255,255,.28); border-radius: 3px; font-size: .92em; justify-self: start; }
+  #controls .d { color: var(--dim); font-weight: 300; line-height: 1.5; }
+  #start .go { margin-top: 38px; font-size: clamp(14px, 1.7vw, 20px); letter-spacing: .3em; font-weight: 300; animation: pulse 1.6s infinite; }
+  #pause, #over { align-items: center; background: rgba(0,0,0,.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); text-align: center; }
+  .card h2 { font-size: clamp(30px, 4.5vw, 54px); font-weight: 200; letter-spacing: .24em; margin-bottom: 26px; }
+  .stats { display: grid; grid-template-columns: repeat(2, minmax(120px, 1fr)); gap: 20px 56px; margin: 0 auto 30px; text-align: left; }
+  .stats div span { display: block; font-size: 10px; letter-spacing: .26em; color: var(--dim); margin-bottom: 2px; font-weight: 300; }
+  .stats div b { font-size: 26px; font-weight: 200; }
+  .btn { display: inline-block; padding: 11px 34px; border: 1px solid rgba(255,255,255,.55); letter-spacing: .3em; font-size: 14px; font-weight: 300; cursor: pointer;
+    background: rgba(255,255,255,.04); color: #fff; border-radius: 2px; transition: background .2s; font-family: inherit; }
+  .btn:hover { background: rgba(255,255,255,.16); }
+  .hint { margin-top: 18px; font-size: 11px; letter-spacing: .22em; color: var(--dim); }
+  .newbest { color: #ffd27a; letter-spacing: .3em; font-size: 12px; margin-bottom: 14px; }
+  #loading { background: #000; align-items: center; text-align: center; letter-spacing: .3em; font-size: 13px; color: var(--dim); transition: opacity .5s; }
+  #loading .bar { width: 160px; height: 1px; background: rgba(255,255,255,.2); margin: 18px auto 0; position: relative; overflow: hidden; }
+  #loading .bar i { position: absolute; inset: 0; width: 40%; background: #fff; animation: slide 1.1s infinite ease-in-out; }
+  @keyframes slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(260%); } }
+
+  /* ---------- debug + touch ---------- */
+  #debug { position: fixed; left: 8px; top: 8px; font: 11px/1.4 ui-monospace, Menlo, monospace; color: #7dff9b; background: rgba(0,0,0,.55); padding: 6px 9px; white-space: pre; pointer-events: none; z-index: 20; }
+  #touch { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+  #touch button { position: absolute; pointer-events: auto; width: 64px; height: 64px; border-radius: 50%; border: 1px solid rgba(255,255,255,.4); background: rgba(255,255,255,.08);
+    color: #fff; font-size: 18px; touch-action: none; font-family: inherit; }
+  #touch button.on { background: rgba(255,255,255,.3); }
+  #touch [data-t=left] { left: 18px; bottom: 140px; } #touch [data-t=right] { left: 96px; bottom: 140px; }
+  #touch [data-t=brake] { left: 18px; bottom: 214px; width: 52px; height: 52px; font-size: 13px; }
+  #touch [data-t=thrust] { right: 18px; bottom: 140px; width: 76px; height: 76px; border-color: rgba(159,216,255,.8); }
+  #touch [data-t=boost] { right: 104px; bottom: 140px; }
+  #touch [data-t=rollL] { right: 104px; bottom: 214px; width: 52px; height: 52px; } #touch [data-t=rollR] { right: 18px; bottom: 228px; width: 52px; height: 52px; }
+</style>
+</head>
+<body>
+<canvas id="c" tabindex="0"></canvas>
+
+<div id="hud" class="hidden">
+  <div id="topbar">
+    <div class="stat"><span class="lbl" id="l-score">得分</span><span class="val" id="h-score">0</span></div>
+    <div class="stat"><span class="lbl" id="l-lives">生命</span><span class="val" id="h-lives">●●●</span></div>
+    <div class="stat"><span class="lbl" id="l-saved">累计逃费</span><span class="val" id="h-saved">¥0</span></div>
+  </div>
+  <div id="mute">MUTED</div>
+  <div id="camtag"></div>
+
+  <div class="ring left">
+    <div id="suc"><i></i><span id="suc-t">SUCTION OFF</span><b id="suc-kn"></b><kbd>F</kbd></div>
+    <div class="ringbox">
+      <svg viewBox="0 0 100 100"><circle class="track" cx="50" cy="50" r="46"/><circle class="arc" id="g-arc" cx="50" cy="50" r="46" transform="rotate(-90 50 50)"/></svg>
+      <div class="in"><span class="rl">G-FORCE</span><span class="rv" id="h-g">1.0</span><span class="ru">G</span></div>
+    </div>
+    <div class="icon"><svg viewBox="0 0 64 32" id="ic-side"><g id="ic-side-g" style="transform-origin: 32px 20px">
+      <path d="M4 22 L9 16 L26 13 L42 7 L54 11 L60 14 L61 21 L56 22 M14 22 L20 22 M36 22 L46 22"/>
+      <circle cx="17" cy="22" r="4.4"/><circle cx="51" cy="22" r="4.4"/></g></svg></div>
+  </div>
+
+  <div class="ring right">
+    <div class="ringbox">
+      <svg viewBox="0 0 100 100"><circle class="track" cx="50" cy="50" r="46"/><circle class="arc" id="a-arc" cx="50" cy="50" r="46" transform="rotate(-90 50 50)"/></svg>
+      <div class="in"><span class="rl">ALTITUDE</span><span class="rv" id="h-alt">0.0</span><span class="ru">FT</span></div>
+    </div>
+    <div class="icon"><svg viewBox="0 0 32 64" id="ic-top"><g id="ic-top-g" style="transform-origin: 16px 32px">
+      <path d="M9 6 Q16 1 23 6 L25 20 L25 46 L23 58 Q16 62 9 58 L7 46 L7 20 Z M10 22 L22 22 M10 42 L22 42"/>
+      <rect class="fillw" x="3" y="12" width="3" height="10" rx="1"/><rect class="fillw" x="26" y="12" width="3" height="10" rx="1"/>
+      <rect class="fillw" x="3" y="42" width="3" height="10" rx="1"/><rect class="fillw" x="26" y="42" width="3" height="10" rx="1"/></g></svg></div>
+  </div>
+
+  <div id="speed">
+    <div class="num" id="h-speed">0</div>
+    <div class="unit">km/h</div>
+    <div id="gas"><div class="lbl"><span>COPV</span><span id="h-gas-pct">100%</span></div><div class="bar"><i id="h-gas"></i></div></div>
+  </div>
+
+  <div id="sucwarn" class="hidden"></div>
+  <div id="popups"><div class="pop"></div><div class="pop"></div><div class="pop"></div><div class="pop"></div></div>
+  <div id="flash"></div>
+</div>
+
+<div id="screens">
+  <div class="screen on" id="loading"><div>正在预热着色器</div><div class="bar"><i></i></div></div>
+  <div class="screen" id="start">
+    <button id="langbtn" type="button">中文 / EN</button>
+    <div class="title" id="s-title">飞跃收费站</div>
+    <div class="sub" id="s-sub">RDSTR · SpaceX 冷气推进套件</div>
+    <div class="rule"></div>
+    <div id="controls"></div>
+    <div class="go" id="s-go">按 Enter / 点击 开始</div>
+  </div>
+  <div class="screen" id="pause"><div class="card">
+    <h2 id="p-title">已暂停</h2>
+    <div class="stats" id="p-stats"></div>
+    <button class="btn" id="p-resume">继续</button> <button class="btn" id="p-restart">重新开始</button>
+    <div class="hint" id="p-hint"></div>
+  </div></div>
+  <div class="screen" id="over"><div class="card">
+    <div class="newbest hidden" id="o-new">新纪录</div>
+    <h2 id="o-title">游戏结束</h2>
+    <div class="stats" id="o-stats"></div>
+    <button class="btn" id="o-restart">重新开始</button>
+    <div class="hint" id="o-hint"></div>
+  </div></div>
+</div>
+
+<div id="fade"><div class="c1"></div><div class="c2"></div></div>
+
+<div id="touch" hidden>
+  <button data-t="left">◀</button><button data-t="right">▶</button><button data-t="brake">刹</button>
+  <button data-t="thrust">推</button><button data-t="boost">冲</button><button data-t="rollL">⟲</button><button data-t="rollR">⟳</button>
+</div>
+<div id="debug" class="hidden"></div>
+
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
