@@ -25,10 +25,10 @@ const zh = {
   'hud.sucOn': '吸附 开',
   'hud.sucOff': '吸附 关',
   'hud.sucWarn': '吸附未开启 / SUCTION OFF',
-  'popup.flyover': '飞跃收费站！省下 ¥{0}',
-  'popup.jump': '跳过收费杆！逃费 ¥{0}',
-  'popup.ram': '冲卡！罚款 ¥{0}',
-  'popup.etc': 'ETC 扣费 ¥{0}',
+  'popup.flyover': '飞跃收费站！省下 {0}',
+  'popup.jump': '跳过收费杆！逃费 {0}',
+  'popup.ram': '冲卡！罚款 {0}',
+  'popup.etc': 'ETC 扣费 {0}',
   'popup.nearMiss': '擦肩 +100',
   'popup.roll': '桶滚 +500',
   'popup.crash': '撞车！',
@@ -57,6 +57,9 @@ const zh = {
   'cam.chase': '追尾镜头',
   'cam.side': '侧拍镜头',
   'cam.drone': '无人机镜头',
+  'touch.brake': '刹',
+  'touch.thrust': '推',
+  'touch.boost': '冲',
 } as const;
 
 type Key = keyof typeof zh;
@@ -82,10 +85,10 @@ const en: Record<Key, string> = {
   'hud.sucOn': 'SUCTION ON',
   'hud.sucOff': 'SUCTION OFF',
   'hud.sucWarn': 'SUCTION OFF',
-  'popup.flyover': 'Flew over the toll station! Saved ¥{0}',
-  'popup.jump': 'Cleared the boom! Skipped ¥{0}',
-  'popup.ram': 'Ran the gate! Fined ¥{0}',
-  'popup.etc': 'ETC: ¥{0} paid',
+  'popup.flyover': 'Flew over the toll station! Saved {0}',
+  'popup.jump': 'Cleared the boom! Skipped {0}',
+  'popup.ram': 'Ran the gate! Fined {0}',
+  'popup.etc': 'ETC: {0} paid',
   'popup.nearMiss': 'Close call +100',
   'popup.roll': 'Barrel roll +500',
   'popup.crash': 'Crash!',
@@ -114,37 +117,40 @@ const en: Record<Key, string> = {
   'cam.chase': 'Chase camera',
   'cam.side': 'Side camera',
   'cam.drone': 'Drone camera',
+  'touch.brake': 'BRAKE',
+  'touch.thrust': 'LIFT',
+  'touch.boost': 'BOOST',
 };
 
 const ja: Record<Key, string> = {
   title: '料金所ジャンプ',
-  subtitle: 'RDSTR · SpaceX コールドガス推進パッケージ',
-  start: 'Enter キー / クリックでスタート',
-  loading: 'シェーダーを準備中…',
-  'ctl.k0': 'W / ↑', 'ctl.d0': '加速',
-  'ctl.k1': 'S / ↓', 'ctl.d1': 'ブレーキ。空中で長押し = その場でホバリング',
-  'ctl.k2': 'A D / ← →', 'ctl.d2': 'ステアリング',
-  'ctl.k3': 'スペース（長押し）', 'ctl.d3': 'スラスター：上昇・ホバリング。壁の上では離脱',
-  'ctl.k4': 'Shift', 'ctl.d4': '後方ジェットで加速（最高 約 380 km/h）',
-  'ctl.k5': 'F', 'ctl.d5': '吸着 オン / オフ（車に内蔵のファンシステム）',
-  'ctl.k6': 'Q / E', 'ctl.d6': '空中でバレルロール（着地までに回り切ること）',
-  'ctl.k7': 'C', 'ctl.d7': 'カメラ：追従 / サイド / ドローン',
+  subtitle: 'RDSTR · SpaceX パッケージ（コールドガス・スラスター）',
+  start: 'Enter キーまたはクリックでスタート',
+  loading: 'グラフィックを準備中…',
+  'ctl.k0': 'W / ↑', 'ctl.d0': 'アクセル',
+  'ctl.k1': 'S / ↓', 'ctl.d1': 'ブレーキ（噴射中に長押しするとその場でホバリング）',
+  'ctl.k2': 'A D / ← →', 'ctl.d2': 'ハンドル',
+  'ctl.k3': 'スペース（長押し）', 'ctl.d3': 'スラスター噴射：上昇・ホバリング（壁面では離脱）',
+  'ctl.k4': 'Shift', 'ctl.d4': 'リアスラスターで加速（最高 約380 km/h）',
+  'ctl.k5': 'F', 'ctl.d5': '吸着オン / オフ（車体下のファンで路面や壁に吸い付く）',
+  'ctl.k6': 'Q / E', 'ctl.d6': '空中でバレルロール（着地前に回り切ること）',
+  'ctl.k7': 'C', 'ctl.d7': 'カメラ切替：チェイス / サイド / ドローン',
   'ctl.k8': 'L', 'ctl.d8': '言語切替：中文 / English / 日本語',
   'ctl.k9': 'Esc · M · R', 'ctl.d9': 'ポーズ · ミュート · リスタート',
   'hud.score': 'スコア',
   'hud.lives': 'ライフ',
   'hud.saved': '浮いた通行料',
-  'hud.sucOn': '吸着 オン',
-  'hud.sucOff': '吸着 オフ',
+  'hud.sucOn': '吸着オン',
+  'hud.sucOff': '吸着オフ',
   'hud.sucWarn': '吸着オフ / SUCTION OFF',
-  'popup.flyover': '料金所を飛び越えた！¥{0} 浮いた',
-  'popup.jump': 'バーを飛び越えた！¥{0} 踏み倒し',
-  'popup.ram': '強行突破！罰金 ¥{0}',
-  'popup.etc': 'ETC で ¥{0} 支払い',
+  'popup.flyover': '料金所を飛び越えた！{0}浮いた',
+  'popup.jump': '開閉バーを飛び越えた！{0}踏み倒し',
+  'popup.ram': '強行突破！罰金 {0}',
+  'popup.etc': 'ETC 料金 {0}',
   'popup.nearMiss': 'ニアミス +100',
   'popup.roll': 'バレルロール +500',
   'popup.crash': 'クラッシュ！',
-  'popup.rollCrash': 'ロール中に着地！',
+  'popup.rollCrash': '回転中に着地！',
   'popup.landing': 'ソフトランディング',
   'popup.detach': '離脱 · スラスター噴射',
   'popup.stunt': 'スタント成功 +2500',
@@ -154,21 +160,24 @@ const ja: Record<Key, string> = {
   'popup.gameOver': '大破',
   'screen.pauseTitle': 'ポーズ中',
   'screen.overTitle': 'ゲームオーバー',
-  'screen.resume': '再開',
+  'screen.resume': '続ける',
   'screen.restart': 'リスタート',
   'screen.distance': '走行距離',
-  'screen.tolls': '料金所スキップ',
+  'screen.tolls': '踏み倒し回数',
   'screen.saved': '浮いた通行料',
   'screen.fines': '罰金',
-  'screen.best': 'ベスト',
+  'screen.best': 'ハイスコア',
   'screen.score': 'スコア',
   'screen.stunts': 'スタント',
   'screen.newBest': '新記録',
-  'screen.hintResume': 'Esc 再開 · R リスタート',
-  'screen.hintRestart': 'R / クリックでリスタート',
-  'cam.chase': '追従カメラ',
+  'screen.hintResume': 'Esc で続ける · R でリスタート',
+  'screen.hintRestart': 'R キーまたはクリックでリスタート',
+  'cam.chase': 'チェイスカメラ',
   'cam.side': 'サイドカメラ',
   'cam.drone': 'ドローンカメラ',
+  'touch.brake': '減速',
+  'touch.thrust': '噴射',
+  'touch.boost': '加速',
 };
 
 export const dict = { zh, en, ja } as const;
@@ -240,18 +249,27 @@ type SignKey = Exclude<keyof typeof SIGNS, 'price'>;
 
 /** The Japanese local line of each sign, shown over the same English line when the UI is Japanese. */
 const SIGNS_JA: Record<SignKey, string> = {
-  fascia: '火星高速 · スターシップ料金所',
-  ahead: 'この先 料金所 500m',
-  etcAhead: 'ETC レーン · 料金所 250m',
+  fascia: '火星高速道路 · スターシップ料金所',
+  ahead: '料金所 500m',
+  etcAhead: 'ETC 料金所 250m',
   etc: 'ETC',
-  etcLanes: 'ETC レーン',
-  exitFar: 'スタントアリーナ出口 1 km',
-  exitNear: 'スタントアリーナ出口 500 m',
+  etcLanes: 'ETC専用',
+  exitFar: 'スタントアリーナ 出口 1km',
+  exitNear: 'スタントアリーナ 出口 500m',
   arena: 'スタントアリーナ',
-  gateOut: '出口 · 高速道路へ',
-  backOn: '高速道路に戻る',
+  gateOut: '出口 · 本線へ',
+  backOn: '本線に合流',
 };
 
 /** A sign's two lines in the current UI language: Japanese + English for ja, otherwise Chinese + English. */
 export const sign = (k: SignKey): [string, string] => [lang === 'ja' ? SIGNS_JA[k] : SIGNS[k][0], SIGNS[k][1]];
-export const signPrice = (p: number): [string, string] => (lang === 'ja' ? [`普通車 ¥${p}`, `CAR ¥${p}`] : SIGNS.price(p));
+export const signPrice = (p: number): [string, string] => (lang === 'ja' ? [`普通車 ${amount(p)}円`, `CAR ¥${amount(p)}`] : SIGNS.price(p));
+
+/** The game keeps money in yuan. The Japanese UI shows it in yen instead, at the market rate, which puts a plaza at
+ *  900円 and up: a believable expressway toll in Japan. */
+export const JPY_PER_CNY = 20;
+/** An amount for display, without the currency mark: yuan as is, or yen rounded to 10 for ja. */
+export const amount = (cny: number): string =>
+  lang === 'ja' ? (Math.round((cny * JPY_PER_CNY) / 10) * 10).toLocaleString('ja-JP') : cny.toLocaleString('en-US');
+/** Money with the currency mark for the UI language: ¥45 (zh, en) or 900円 (ja). */
+export const money = (cny: number): string => (lang === 'ja' ? `${amount(cny)}円` : `¥${amount(cny)}`);

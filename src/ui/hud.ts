@@ -1,6 +1,6 @@
 // HUD (DOM over the canvas). Updated at no more than 30 Hz, and a DOM write only happens when a shown value changes.
 // The suction state always sits next to the G-FORCE gauge (with a downforce readout in kN while it is on).
-import { t } from './i18n';
+import { money, t } from './i18n';
 
 export interface HudState {
   score: number;
@@ -83,7 +83,7 @@ export class Hud {
       l.lives = s.lives;
       this.lives.innerHTML = '●'.repeat(Math.max(0, s.lives)) + '<span class="off">' + '●'.repeat(Math.max(0, 3 - s.lives)) + '</span>';
     }
-    if (s.saved !== l.saved) { l.saved = s.saved; this.saved.textContent = '¥' + s.saved.toLocaleString('en-US'); }
+    if (s.saved !== l.saved) { l.saved = s.saved; this.saved.textContent = money(s.saved); }
     const kmh = Math.round(s.kmh);
     if (kmh !== l.kmh) { l.kmh = kmh; this.speed.textContent = String(kmh); }
     const gas = Math.round(s.gas01 * 100);

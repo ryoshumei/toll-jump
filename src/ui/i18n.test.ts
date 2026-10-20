@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detectLang, dict, getLang, isLang, LANGS, setLang, sign, signPrice, SIGNS, t, toggleLang } from './i18n';
+import { detectLang, dict, getLang, isLang, LANGS, money, setLang, sign, signPrice, SIGNS, t, toggleLang } from './i18n';
 
 describe('i18n', () => {
   it('has every key in every language, and no empty strings', () => {
@@ -62,9 +62,21 @@ describe('i18n', () => {
       expect(signPrice(45)).toEqual(SIGNS.price(45));
     }
     setLang('ja');
-    expect(sign('fascia')).toEqual(['火星高速 · スターシップ料金所', SIGNS.fascia[1]]);
+    expect(sign('fascia')).toEqual(['火星高速道路 · スターシップ料金所', SIGNS.fascia[1]]);
     expect(sign('arena')).toEqual(['スタントアリーナ', 'STUNT ARENA']);
-    expect(signPrice(60)).toEqual(['普通車 ¥60', 'CAR ¥60']);
+    expect(signPrice(60)).toEqual(['普通車 1,200円', 'CAR ¥1,200']);
+    setLang(start);
+  });
+
+  it('shows money in yuan, or in yen at a believable toll level for the Japanese UI', () => {
+    const start = getLang();
+    setLang('zh');
+    expect(money(45)).toBe('¥45');
+    expect(t('popup.flyover', money(45))).toBe('飞跃收费站！省下 ¥45');
+    setLang('ja');
+    expect(money(45)).toBe('900円');
+    expect(money(200)).toBe('4,000円');
+    expect(t('popup.flyover', money(50))).toBe('料金所を飛び越えた！1,000円浮いた');
     setLang(start);
   });
 });

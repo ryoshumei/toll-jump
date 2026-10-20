@@ -29,7 +29,7 @@ import { makeAlphaTexture, makeGlowTexture, makePoolTexture, redrawLiveSigns } f
 import { Traffic } from './render/traffic';
 import { GameAudio } from './ui/audio';
 import { Hud, type HudState } from './ui/hud';
-import { getLang, isLang, onLang, setLang, sign, t, toggleLang, type Lang } from './ui/i18n';
+import { getLang, isLang, money, onLang, setLang, sign, t, toggleLang, type Lang } from './ui/i18n';
 import { Input } from './ui/input';
 import { Screens, type RunStats } from './ui/screens';
 
@@ -333,18 +333,18 @@ function onToll(o: TollOutcome): void {
   switch (o) {
     case 'flyover':
       addToll(score, 'flyover', price);
-      pop(t('popup.flyover', price), 'big');
+      pop(t('popup.flyover', money(price)), 'big');
       audio.chime();
       rig.addTrauma(0.12);
       break;
     case 'jump':
       addToll(score, 'jump', price);
-      pop(t('popup.jump', price), 'good');
+      pop(t('popup.jump', money(price)), 'good');
       audio.chime();
       break;
     case 'etc': // the normal, legal way through: the boom lifts, the fee is paid
       addEtc(score, price);
-      pop(t('popup.etc', price), 'info');
+      pop(t('popup.etc', money(price)), 'info');
       audio.chime();
       break;
     case 'ram':
@@ -357,7 +357,7 @@ function onToll(o: TollOutcome): void {
       audio.boom();
       rig.addTrauma(0.6);
       hud.flash();
-      pop(t('popup.ram', PLAZA.fine), 'bad');
+      pop(t('popup.ram', money(PLAZA.fine)), 'bad');
       break;
     case 'crash':
       crash(t('popup.crash'));

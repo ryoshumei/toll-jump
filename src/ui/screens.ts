@@ -1,5 +1,5 @@
 // Start, pause and game-over screens (DOM). Buttons call back into the game. All text comes from i18n.
-import { getLang, HTML_LANG, LANG_LABEL, LANGS, t } from './i18n';
+import { getLang, HTML_LANG, LANG_LABEL, LANGS, money, t } from './i18n';
 
 export interface RunStats {
   score: number;
@@ -37,6 +37,12 @@ export class Screens {
     // <html lang> picks the right CJK glyphs and the :lang(ja) font stack in index.html
     document.documentElement.lang = HTML_LANG[getLang()];
     $('langbtn').innerHTML = LANGS.map((l) => `<span${l === getLang() ? ' class="on"' : ''}>${LANG_LABEL[l]}</span>`).join(' · ');
+    document.title = getLang() === 'en' ? 'RDSTR Toll Jump' : `${t('title')} · RDSTR Toll Jump`;
+    $('loading-text').textContent = t('loading');
+    for (const k of ['brake', 'thrust', 'boost'] as const) {
+      const b = document.querySelector(`#touch [data-t=${k}]`);
+      if (b) b.textContent = t(`touch.${k}`);
+    }
     $('s-title').textContent = t('title');
     $('s-sub').textContent = t('subtitle');
     $('s-go').textContent = t('start');
@@ -63,8 +69,8 @@ export class Screens {
       [t('screen.best'), Math.floor(s.best).toLocaleString('en-US')],
       [t('screen.distance'), `${(s.distance / 1000).toFixed(2)} km`],
       [t('screen.tolls'), String(s.tolls)],
-      [t('screen.saved'), `¥${s.saved.toLocaleString('en-US')}`],
-      [t('screen.fines'), `¥${s.fines.toLocaleString('en-US')}`],
+      [t('screen.saved'), money(s.saved)],
+      [t('screen.fines'), money(s.fines)],
       [t('screen.stunts'), String(s.stunts)],
     ];
     el.innerHTML = '';
