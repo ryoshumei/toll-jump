@@ -25,11 +25,11 @@ import { Roadster, glbExists, loadGlbCar, type CarModel } from './render/roadste
 import { SmokeSystem } from './render/smoke';
 import { Thrusters } from './render/thrusters';
 import { TollPlaza } from './render/tollPlaza';
-import { makeAlphaTexture, makeGlowTexture, makePoolTexture } from './render/textures';
+import { makeAlphaTexture, makeGlowTexture, makePoolTexture, redrawLiveSigns } from './render/textures';
 import { Traffic } from './render/traffic';
 import { GameAudio } from './ui/audio';
 import { Hud, type HudState } from './ui/hud';
-import { getLang, isLang, onLang, setLang, SIGNS, t, toggleLang, type Lang } from './ui/i18n';
+import { getLang, isLang, onLang, setLang, sign, t, toggleLang, type Lang } from './ui/i18n';
 import { Input } from './ui/input';
 import { Screens, type RunStats } from './ui/screens';
 
@@ -119,7 +119,7 @@ const audio = new GameAudio();
 audio.unlockOnGesture();
 const hud = new Hud();
 const screens = new Screens({ onStart: () => startGame(), onResume: () => setPaused(false), onRestart: () => startGame(), onLang: () => toggleLang() });
-onLang(() => { hud.applyLang(); screens.applyLang(); });
+onLang(() => { hud.applyLang(); screens.applyLang(); redrawLiveSigns(); });
 
 const fadeEl = document.getElementById('fade')!;
 const fadeC1 = fadeEl.querySelector('.c1') as HTMLElement;
@@ -227,7 +227,7 @@ function startTransition(to: Place): void {
   fade.t = 0;
   fade.to = to;
   fade.speed = Math.max(0, forwardSpeed(veh));
-  const [c1, c2] = to === 'arena' ? SIGNS.arena : SIGNS.backOn;
+  const [c1, c2] = sign(to === 'arena' ? 'arena' : 'backOn');
   fadeC1.textContent = c1;
   fadeC2.textContent = c2;
 }

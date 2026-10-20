@@ -1,5 +1,6 @@
 // Procedural textures, generated at startup (no external files).
 import * as THREE from 'three';
+import { getLang } from '../ui/i18n';
 
 // ---------- tileable noise ----------
 function hash(x: number, y: number, s: number): number {
@@ -247,6 +248,9 @@ export function canvasTexture(w: number, h: number, draw: (g: CanvasRenderingCon
 }
 
 export const CJK_FONT = '"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC",sans-serif';
+export const JA_FONT = '"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,"Noto Sans CJK JP","Source Han Sans JP",sans-serif';
+/** Japanese signs need Japanese glyph forms for their kanji, so the sign font follows the UI language. */
+const localFont = (): string => (getLang() === 'ja' ? JA_FONT : CJK_FONT);
 
 /** Redraw a sign canvas texture in place (for the price board and similar). */
 export function redrawText(
@@ -291,8 +295,8 @@ export function drawBilingual(
   g.fillStyle = fg;
   const fit = (text: string, px: number, weight: string, maxW: number) => {
     let p = px;
-    g.font = `${weight} ${p}px ${CJK_FONT}`;
-    while (g.measureText(text).width > maxW && p > 10) { p -= 2; g.font = `${weight} ${p}px ${CJK_FONT}`; }
+    g.font = `${weight} ${p}px ${localFont()}`;
+    while (g.measureText(text).width > maxW && p > 10) { p -= 2; g.font = `${weight} ${p}px ${localFont()}`; }
   };
   fit(zh, o.zhPx ?? H * 0.42, 'bold', W * 0.94);
   g.fillText(zh, W / 2, H * 0.35);
@@ -315,4 +319,27 @@ export function redrawBilingual(
   const c = tex.image as HTMLCanvasElement;
   drawBilingual(c.getContext('2d')!, c.width, c.height, zh, en, bg, fg, o);
   tex.needsUpdate = true;
+}
+
+type SignOpts = { zhPx?: number; enPx?: number; glow?: number; accent?: string; border?: string };
+interface LiveSign { tex: THREE.CanvasTexture; lines: () => [string, string]; bg: string; fg: string; o: SignOpts }
+const liveSigns: LiveSign[] = [];
+
+/** A bilingual sign whose lines come from lines() (they follow the UI language). Built once, redrawn in place. */
+export function liveSign(
+  lines: () => [string, string], W: number, H: number, bg: string, fg: string, o: SignOpts = {},
+): THREE.CanvasTexture {
+  const [a, b] = lines();
+  const tex = bilingualSign(a, b, W, H, bg, fg, o);
+  liveSigns.push({ tex, lines, bg, fg, o });
+  return tex;
+}
+
+/** Redraw one live sign (its text changed) or, with no argument, all of them (the UI language changed). */
+export function redrawLiveSigns(only?: THREE.CanvasTexture): void {
+  for (const s of liveSigns) {
+    if (only && s.tex !== only) continue;
+    const [a, b] = s.lines();
+    redrawBilingual(s.tex, a, b, s.bg, s.fg, s.o);
+  }
 }

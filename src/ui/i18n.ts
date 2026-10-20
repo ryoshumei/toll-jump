@@ -1,6 +1,7 @@
 // All UI text, in Chinese, English and Japanese, from one dictionary. Every key exists in every language (a test
-// checks it). In-world signs stay bilingual on the texture (SIGNS): a Chinese line over an English line, like real
-// expressway signs on this (Chinese) highway, whatever the UI language.
+// checks it). In-world signs are bilingual on the texture: a local line over an English line, like real expressway
+// signs. The local line is Chinese (this is a Chinese highway) unless the UI is Japanese: then it is Japanese, like
+// signs in Japan (sign(), signPrice()).
 export type Lang = 'zh' | 'en' | 'ja';
 
 const zh = {
@@ -185,6 +186,7 @@ export const SIGNS = {
   ahead: ['前方收费站 500m', 'TOLL STATION AHEAD 500 m'] as [string, string],
   etcAhead: ['ETC 通道 收费站 250m', 'ETC LANES · TOLL 250 m'] as [string, string],
   etc: ['ETC', 'ETC'] as [string, string],
+  etcLanes: ['ETC 通道', 'ETC LANES'] as [string, string],
   price: (p: number): [string, string] => [`小型车 ¥${p}`, `CAR ¥${p}`],
   exitFar: ['特技场出口 1 km', 'STUNT ARENA EXIT 1 km'] as [string, string],
   exitNear: ['特技场出口 500 m', 'STUNT ARENA EXIT 500 m'] as [string, string],
@@ -233,3 +235,23 @@ export function t(key: Key, ...args: (string | number)[]): string {
   for (let i = 0; i < args.length; i++) s = s.replace(`{${i}}`, String(args[i]));
   return s;
 }
+
+type SignKey = Exclude<keyof typeof SIGNS, 'price'>;
+
+/** The Japanese local line of each sign, shown over the same English line when the UI is Japanese. */
+const SIGNS_JA: Record<SignKey, string> = {
+  fascia: '火星高速 · スターシップ料金所',
+  ahead: 'この先 料金所 500m',
+  etcAhead: 'ETC レーン · 料金所 250m',
+  etc: 'ETC',
+  etcLanes: 'ETC レーン',
+  exitFar: 'スタントアリーナ出口 1 km',
+  exitNear: 'スタントアリーナ出口 500 m',
+  arena: 'スタントアリーナ',
+  gateOut: '出口 · 高速道路へ',
+  backOn: '高速道路に戻る',
+};
+
+/** A sign's two lines in the current UI language: Japanese + English for ja, otherwise Chinese + English. */
+export const sign = (k: SignKey): [string, string] => [lang === 'ja' ? SIGNS_JA[k] : SIGNS[k][0], SIGNS[k][1]];
+export const signPrice = (p: number): [string, string] => (lang === 'ja' ? [`普通車 ¥${p}`, `CAR ¥${p}`] : SIGNS.price(p));

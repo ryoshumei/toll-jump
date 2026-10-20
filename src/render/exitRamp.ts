@@ -4,9 +4,11 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { EXIT, ROAD } from '../config';
 import { exitZ, nearestExit } from '../sim/course';
-import { SIGNS } from '../ui/i18n';
+import { sign as signLines } from '../ui/i18n';
 import { gantry } from './tollPlaza';
-import { bilingualSign, makeGlowTexture } from './textures';
+import { liveSign, makeGlowTexture } from './textures';
+
+const arrow = ([a, b]: [string, string]): [string, string] => ['↗ ' + a, b];
 
 const smooth = (t: number) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
 const X0 = 3 * ROAD.halfLane;
@@ -81,7 +83,7 @@ export class ExitRamp {
     g.add(new THREE.Mesh(mergeGeometries([post(gx - hw), post(gx + hw), beam.toNonIndexed()])!, new THREE.MeshStandardMaterial({ color: 0x2b2f36, metalness: 0.7, roughness: 0.5 })));
     const sign = new THREE.Mesh(
       new THREE.PlaneGeometry(2 * hw + 0.6, 2.2),
-      new THREE.MeshBasicMaterial({ map: bilingualSign(SIGNS.arena[0], SIGNS.arena[1], 1024, 280, '#120a2a', '#e9dcff', { zhPx: 140, enPx: 70, glow: 22, accent: '#8a5bff' }), color: new THREE.Color(1.5, 1.5, 1.5) }),
+      new THREE.MeshBasicMaterial({ map: liveSign(() => signLines('arena'), 1024, 280, '#120a2a', '#e9dcff', { zhPx: 140, enPx: 70, glow: 22, accent: '#8a5bff' }), color: new THREE.Color(1.5, 1.5, 1.5) }),
     );
     sign.position.set(gx, 6.6, gz + 0.4);
     g.add(sign);
@@ -94,9 +96,9 @@ export class ExitRamp {
     g.add(portal);
 
     // bilingual exit signs over the highway, 1 km and 500 m before the ramp
-    const far = gantry(bilingualSign('↗ ' + SIGNS.exitFar[0], SIGNS.exitFar[1], 1024, 320, '#0b6a3a', '#ffffff', { zhPx: 128, enPx: 66, glow: 6, border: '#ffffff' }), 9, 2.8);
+    const far = gantry(liveSign(() => arrow(signLines('exitFar')), 1024, 320, '#0b6a3a', '#ffffff', { zhPx: 128, enPx: 66, glow: 6, border: '#ffffff' }), 9, 2.8);
     far.position.z = EXIT.signFar;
-    const near = gantry(bilingualSign('↗ ' + SIGNS.exitNear[0], SIGNS.exitNear[1], 1024, 320, '#0b6a3a', '#ffffff', { zhPx: 128, enPx: 66, glow: 6, border: '#ffffff' }), 9, 2.8);
+    const near = gantry(liveSign(() => arrow(signLines('exitNear')), 1024, 320, '#0b6a3a', '#ffffff', { zhPx: 128, enPx: 66, glow: 6, border: '#ffffff' }), 9, 2.8);
     near.position.z = EXIT.signNear;
     g.add(far, near);
     g.visible = false;

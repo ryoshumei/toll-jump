@@ -3,10 +3,10 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ARENA, WALL } from '../config';
-import { SIGNS } from '../ui/i18n';
+import { sign } from '../ui/i18n';
 import { SuctionWall } from './ramp';
 import { shared } from './environment';
-import { bilingualSign, makeGlowTexture } from './textures';
+import { liveSign, makeGlowTexture } from './textures';
 
 const smooth = (t: number) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
 
@@ -170,7 +170,7 @@ export class Arena {
     g.add(new THREE.Mesh(mergeGeometries([post(-6.6), post(6.6), beam.toNonIndexed()])!, new THREE.MeshStandardMaterial({ color: 0x2b2f36, metalness: 0.7, roughness: 0.5, envMap: shared.env, envMapIntensity: 0.4 })));
     const gateSign = new THREE.Mesh(
       new THREE.PlaneGeometry(10, 2.2),
-      new THREE.MeshBasicMaterial({ map: bilingualSign(SIGNS.gateOut[0], SIGNS.gateOut[1], 1024, 230, '#0b6a3a', '#ffffff', { zhPx: 120, enPx: 62, border: '#ffffff' }), color: new THREE.Color(1.2, 1.2, 1.2), side: THREE.DoubleSide }),
+      new THREE.MeshBasicMaterial({ map: liveSign(() => sign('gateOut'), 1024, 230, '#0b6a3a', '#ffffff', { zhPx: 120, enPx: 62, border: '#ffffff' }), color: new THREE.Color(1.2, 1.2, 1.2), side: THREE.DoubleSide }),
     );
     gateSign.position.set(0, 6.9, gz);
     g.add(gateSign);

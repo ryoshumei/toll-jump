@@ -167,7 +167,7 @@ The first plaza comes at about 800 m, then one every 2 km.
 - **Languages: Chinese, English and Japanese.**
   - All UI text (HUD labels, popups, screens, the controls list and hints) comes from one dictionary, `src/ui/i18n.ts`, with a zh and an en entry for every key. A test checks that both languages have every key.
   - The default comes from `navigator.language`. L, or a 中文 · EN · 日本語 button on the start screen, cycles it. The choice is saved in localStorage, wrapped in try/catch.
-  - In-world signs carry both languages on the texture, like real Chinese expressway signs: one Chinese line and one English line, for example `火星高速 · 星舰收费站` over `MARS EXPRESSWAY · STARSHIP TOLL STATION`.
+  - In-world signs carry both languages on the texture, like real Chinese expressway signs: one Chinese line and one English line, for example `火星高速 · 星舰收费站` over `MARS EXPRESSWAY · STARSHIP TOLL STATION`. When the UI is Japanese, the Chinese line becomes Japanese (`火星高速 · スターシップ料金所`), and the signs are redrawn as soon as the language changes.
   - The README gets an English section.
 - **Start screen**: a homage to `roadster.png`. A dark studio with a soft spotlight pool on the floor, the car slowly turning, title **飞跃收费站**, subtitle "RDSTR · SpaceX 冷气推进套件", a list of the controls, and "按 Enter / 点击 开始".
 - **Pause screen** and **game-over screen**: show distance, tolls skipped, ¥ saved and the best score, with a restart button.

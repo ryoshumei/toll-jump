@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detectLang, dict, getLang, isLang, LANGS, SIGNS, t, toggleLang } from './i18n';
+import { detectLang, dict, getLang, isLang, LANGS, setLang, sign, signPrice, SIGNS, t, toggleLang } from './i18n';
 
 describe('i18n', () => {
   it('has every key in every language, and no empty strings', () => {
@@ -52,5 +52,19 @@ describe('i18n', () => {
     expect(SIGNS.price(45)[0]).toContain('¥45');
     expect(SIGNS.price(45)[1]).toContain('¥45');
     expect(SIGNS.exitFar[1]).toMatch(/STUNT ARENA/);
+  });
+
+  it('signs read Chinese + English, or Japanese + English when the UI is Japanese', () => {
+    const start = getLang();
+    for (const l of ['zh', 'en'] as const) {
+      setLang(l);
+      expect(sign('fascia')).toEqual(SIGNS.fascia);
+      expect(signPrice(45)).toEqual(SIGNS.price(45));
+    }
+    setLang('ja');
+    expect(sign('fascia')).toEqual(['火星高速 · スターシップ料金所', SIGNS.fascia[1]]);
+    expect(sign('arena')).toEqual(['スタントアリーナ', 'STUNT ARENA']);
+    expect(signPrice(60)).toEqual(['普通車 ¥60', 'CAR ¥60']);
+    setLang(start);
   });
 });

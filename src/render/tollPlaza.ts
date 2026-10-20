@@ -8,9 +8,9 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { PLAZA, ROAD } from '../config';
 import { nearestPlaza, plazaZ } from '../sim/course';
 import { PLAZA_LANES, isEtcLane, laneCenterX, tollPrice, type TollTracker } from '../sim/toll';
-import { SIGNS } from '../ui/i18n';
+import { sign, signPrice } from '../ui/i18n';
 import { shared } from './environment';
-import { bilingualSign, canvasTexture, makeAlphaTexture, redrawBilingual } from './textures';
+import { bilingualSign, canvasTexture, liveSign, makeAlphaTexture, redrawLiveSigns } from './textures';
 
 const P = ROAD.plazaPitch;
 const HALF = (PLAZA_LANES - 1) / 2;
@@ -82,6 +82,7 @@ export class TollPlaza {
   readonly group = new THREE.Group();
   j = -1;
   private priceTex: THREE.CanvasTexture;
+  private price = 45; // the toll on the price board: set per plaza, drawn in the current UI language
   private booms: THREE.InstancedMesh;
   private goSig: THREE.InstancedMesh;
   private stopSig: THREE.InstancedMesh;
@@ -134,16 +135,16 @@ export class TollPlaza {
     // --- bilingual fascia sign and boards on the front of the valance ---
     const fascia = new THREE.Mesh(
       new THREE.PlaneGeometry(27, 2.0),
-      basic(bilingualSign(SIGNS.fascia[0], SIGNS.fascia[1], 2048, 160, '#04080c', '#e8f7ff', { zhPx: 92, enPx: 44, glow: 22, accent: '#ff2a2a' }), 1.05),
+      basic(liveSign(() => sign('fascia'), 2048, 160, '#04080c', '#e8f7ff', { zhPx: 92, enPx: 44, glow: 22, accent: '#ff2a2a' }), 1.05),
     );
     fascia.position.set(0, 5.85, D + 0.02);
     g.add(fascia);
     const px = W - 3.2;
-    this.priceTex = bilingualSign(...SIGNS.price(45), 1024, 256, '#050403', '#ffb02e', { zhPx: 110, enPx: 70, glow: 18, accent: '#ff9a00' });
+    this.priceTex = liveSign(() => signPrice(this.price), 1024, 256, '#050403', '#ffb02e', { zhPx: 110, enPx: 70, glow: 18, accent: '#ff9a00' });
     const priceR = new THREE.Mesh(new THREE.PlaneGeometry(5.6, 1.95), basic(this.priceTex, 1.0));
     priceR.position.set(px, 5.85, D + 0.02);
     g.add(priceR);
-    const etcSign = new THREE.Mesh(new THREE.PlaneGeometry(5.6, 1.95), basic(bilingualSign('ETC 通道', 'ETC LANES', 1024, 356, '#0a0414', '#d9b8ff', { zhPx: 150, enPx: 90, glow: 22, accent: '#8a3dff' }), 1.0));
+    const etcSign = new THREE.Mesh(new THREE.PlaneGeometry(5.6, 1.95), basic(liveSign(() => sign('etcLanes'), 1024, 356, '#0a0414', '#d9b8ff', { zhPx: 150, enPx: 90, glow: 22, accent: '#8a3dff' }), 1.0));
     etcSign.position.set(-px, 5.85, D + 0.02);
     g.add(etcSign);
     const haze = new THREE.Mesh(
@@ -219,9 +220,9 @@ export class TollPlaza {
     g.add(spill);
 
     // --- approach gantries: 500 m and 250 m before the booths (bilingual) ---
-    const g500 = gantry(bilingualSign(SIGNS.ahead[0], SIGNS.ahead[1], 1024, 320, '#0b6a3a', '#ffffff', { zhPx: 130, enPx: 62, glow: 6, border: '#ffffff' }), 9, 2.8);
+    const g500 = gantry(liveSign(() => sign('ahead'), 1024, 320, '#0b6a3a', '#ffffff', { zhPx: 130, enPx: 62, glow: 6, border: '#ffffff' }), 9, 2.8);
     g500.position.z = PLAZA.signFar;
-    const g250 = gantry(bilingualSign(SIGNS.etcAhead[0], SIGNS.etcAhead[1], 1024, 320, '#0b6a3a', '#ffffff', { zhPx: 120, enPx: 62, glow: 6, border: '#ffffff' }), 9, 2.8);
+    const g250 = gantry(liveSign(() => sign('etcAhead'), 1024, 320, '#0b6a3a', '#ffffff', { zhPx: 120, enPx: 62, glow: 6, border: '#ffffff' }), 9, 2.8);
     g250.position.z = PLAZA.signEtc;
     g.add(g500, g250);
 
@@ -246,7 +247,8 @@ export class TollPlaza {
   place(j: number, tracker: TollTracker | null): void {
     this.j = j;
     this.group.position.z = plazaZ(j);
-    redrawBilingual(this.priceTex, ...SIGNS.price(tollPrice(j)), '#050403', '#ffb02e', { zhPx: 110, enPx: 70, glow: 18, accent: '#ff9a00' });
+    this.price = tollPrice(j);
+    redrawLiveSigns(this.priceTex);
     let go = 0, stop = 0, boards = 0;
     for (let l = 0; l < PLAZA_LANES; l++) {
       const e = isEtcLane(j, l);

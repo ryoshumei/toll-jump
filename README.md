@@ -53,14 +53,14 @@ npm test           # vitest：src/sim 与 src/ui/i18n 的单元测试
   - 在地面通过 **ETC 车道**（任何速度）：**ETC 扣费 ¥45** + 「嘀」，不加分也不罚款，这是正常合法的通行方式
   - 在地面撞人工车道的栏杆：**冲卡！罚款 ¥200**（栏杆碎裂、减速、震屏，不扣命）
   - 撞到收费亭或雨棚：撞车；**蹭到岛的路缘只会被弹开**，损失一点速度
-  - 所有路牌都是中英双语（上一行中文，下一行英文）。
+  - 路牌都是双语：上一行中文（选日语时换成日语），下一行英文。
 - **交通**：数量约为初版的一半，Semi 货车很少；任何位置至少保留一条空车道；收费站前 150 米与特技场匝道前后不刷车。擦肩而过（1 米内、高速）+100。
 - **碰撞与命数**：AABB 检测。撞车大幅减速、震屏、火花，扣一条命（共 3 条），之后闪烁无敌 2 秒。
 - **计分**：每米 +1，滞空每秒 +100，每次桶滚 +500，擦肩 +100，飞越 / 跳杆 / 特技有额外奖励；最高分存 localStorage（带 try/catch）。
 - **镜头与后期**：基于 `1 - exp(-k*dt)` 的弹簧追尾镜头（FOV 随速度 60→75，加速时有冲击感），特技时切到能框住整个翻转和降落的侧面镜头；基于 trauma 的震动；EffectComposer（4× MSAA HDR）→ 半分辨率 UnrealBloom → 暗角 / 颗粒 / 随速度增大的色差 → ACES 色调映射。
 - **HUD**：左下 G-FORCE 圆环 + 侧视小车图标，其上方是常驻的吸附状态；右下 ALTITUDE FT 圆环 + 俯视小车图标；底部中间速度与 COPV 气瓶条；顶部得分 / 生命 / 累计逃费；中央弹出文字。HUD 最多 30 Hz 更新，且只在数值变化时写 DOM。
 - **音频**：全部 WebAudio 程序合成（电机啸叫、推进器轰鸣、风声、吸附风扇、撞击、ETC「嘀」）。
-- **三种语言**：所有界面文字来自一个字典 `src/ui/i18n.ts`（中、英、日各一份，测试检查键一致）；默认语言取自 `navigator.language`，L 键或开始画面按钮在 中文 → English → 日本語 之间切换，选择保存在 localStorage。路牌保持中英双语。
+- **三种语言**：所有界面文字来自一个字典 `src/ui/i18n.ts`（中、英、日各一份，测试检查键一致）；默认语言取自 `navigator.language`，L 键或开始画面按钮在 中文 → English → 日本語 之间切换，选择保存在 localStorage。路牌平时是中英双语，选日语时换成日英双语（切换语言时立即重画）。
 
 ## 车模
 
@@ -108,7 +108,7 @@ npm test           # vitest：src/sim 与 src/ui/i18n 的单元测试
 ```
 src/main.ts          游戏循环、状态机、场景切换（高速 / 特技场）、调试接口
 src/config.ts        全部可调参数
-src/ui/i18n.ts       中英日字典（含中英双语路牌文字），i18n.test.ts 检查键一致
+src/ui/i18n.ts       中英日字典（含路牌文字：中/日 + 英），i18n.test.ts 检查键一致
 src/sim/             纯逻辑（不引用 three.js），有单元测试
   vehicle.ts         驱动、转向、重力、推进、气瓶、桶滚、后向喷气、边界、落地缓冲、翻转掉头
   suction.ts         车的吸附系统（开关、抓地、下压力）
@@ -178,10 +178,10 @@ Press **Enter** or click to start. `?lang=en` (or `zh`, `ja`) forces a language;
 
 - **Suction belongs to the car, not the wall.** On the road it gives more grip and squats the car a few centimetres; on the wall it lets the car climb slowly, stop and hang past vertical; in the air it does nothing. With suction off, the car stays on the wall only while it is fast enough (centripetal force must beat gravity's pull). Once it slows it falls off, and the HUD warns "SUCTION OFF".
 - **Stunt arena** (reached through the highway exit ramp, with bilingual signs at 1 km and 500 m, and a fade with the card "STUNT ARENA"). A separate scene with no traffic: dark tarmac, long red LED lines, floodlight towers aimed at a 7 m wide curved concrete wall that goes 15° past vertical and leans back at the 20 m tip. Climb it with suction on (W / S / A / D; stop anywhere), or press Space to detach at any height. Off the tip the car is upside down with its nose up and back; the thrusters and RCS flip it upright and turn it around in about 1.2 s; it hovers on its downward plumes, lands in a giant cloud **facing the opposite way** (+2500 points), and drives out of the venue gate back to the highway.
-- **Toll plazas** every 2 km: 6 wide lanes (5.5 m openings, 1.2 m islands). About half are **ETC lanes** whose booms lift by themselves ("ETC: ¥45 paid", no bonus and no penalty; the normal legal way through); manual lanes keep the boom down (ram it: "Fined ¥200", no life lost). Fly over the canopy roof for the big bonus ("Saved ¥45"), or clear the boom in the air. Hitting a booth or the canopy is a crash; grazing an island curb only deflects the car. All in-world signs carry a Chinese line over an English line.
+- **Toll plazas** every 2 km: 6 wide lanes (5.5 m openings, 1.2 m islands). About half are **ETC lanes** whose booms lift by themselves ("ETC: ¥45 paid", no bonus and no penalty; the normal legal way through); manual lanes keep the boom down (ram it: "Fined ¥200", no life lost). Fly over the canopy roof for the big bonus ("Saved ¥45"), or clear the boom in the air. Hitting a booth or the canopy is a crash; grazing an island curb only deflects the car. All in-world signs carry a Chinese line (Japanese when the UI is Japanese) over an English line.
 - **Thrusters and smoke**: nested additive plume cones, nozzle glare, an under-car light, and a one-draw-call smoke system (about 2,500 depth-sorted particles) that rolls out into big clouds on the road, trails downward in the air and takes a pink tint near the red edge strips. A landing burn fires by itself near the ground.
 - **Traffic is light**: about half the first version's density, Semis are rare, one lane is always clear, and there is no traffic within 150 m before a plaza or before the arena exit.
-- **Three UI languages**: one dictionary (`src/ui/i18n.ts`, a test checks that every language has every key). The default comes from `navigator.language`; L or the 中文 · EN · 日本語 button on the start screen cycles it and the choice is saved. In-world signs stay Chinese + English.
+- **Three UI languages**: one dictionary (`src/ui/i18n.ts`, a test checks that every language has every key). The default comes from `navigator.language`; L or the 中文 · EN · 日本語 button on the start screen cycles it and the choice is saved. In-world signs read Chinese + English, or Japanese + English when the UI is Japanese (redrawn as soon as the language changes).
 - **Car model**: the game loads `public/models/roadster.glb` (see `docs/CAR_MODEL.md`) when it exists and uses the built-in procedural car otherwise. `?car=glb|procedural` forces one.
 
 ## Performance
@@ -200,4 +200,5 @@ Press **Enter** or click to start. `?lang=en` (or `zh`, `ja`) forces a language;
 
 - プレイ：<https://ryoshumei.github.io/toll-jump/>
 - 操作：W / S 加速・ブレーキ · A / D ステアリング · スペース スラスター · Shift 後方ジェット · F 吸着 · Q / E バレルロール · C カメラ · L 言語切替（中文 / English / 日本語）
+- 日本語を選ぶと、道路標識も日本語＋英語になります。
 - 非公式のファン作品です。Tesla、SpaceX とは関係ありません。
