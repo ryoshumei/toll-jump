@@ -1,6 +1,7 @@
-// All UI text, in Chinese and English, from one dictionary. Every key exists in both languages (a test checks it).
-// In-world signs are bilingual on the texture (SIGNS): a Chinese line over an English line, like real expressway signs.
-export type Lang = 'zh' | 'en';
+// All UI text, in Chinese, English and Japanese, from one dictionary. Every key exists in every language (a test
+// checks it). In-world signs stay bilingual on the texture (SIGNS): a Chinese line over an English line, like real
+// expressway signs on this (Chinese) highway, whatever the UI language.
+export type Lang = 'zh' | 'en' | 'ja';
 
 const zh = {
   title: '飞跃收费站',
@@ -15,7 +16,7 @@ const zh = {
   'ctl.k5': 'F', 'ctl.d5': '吸附 开 / 关（车自带的风扇系统）',
   'ctl.k6': 'Q / E', 'ctl.d6': '空中桶滚（落地前必须转完）',
   'ctl.k7': 'C', 'ctl.d7': '镜头：追尾 / 侧拍 / 无人机',
-  'ctl.k8': 'L', 'ctl.d8': '切换语言：中文 / English',
+  'ctl.k8': 'L', 'ctl.d8': '切换语言：中文 / English / 日本語',
   'ctl.k9': 'Esc · M · R', 'ctl.d9': '暂停 · 静音 · 重来',
   'hud.score': '得分',
   'hud.lives': '生命',
@@ -72,7 +73,7 @@ const en: Record<Key, string> = {
   'ctl.k5': 'F', 'ctl.d5': 'Suction on / off (the car\'s own fan system)',
   'ctl.k6': 'Q / E', 'ctl.d6': 'Barrel roll in the air (finish it before landing)',
   'ctl.k7': 'C', 'ctl.d7': 'Camera: chase / side / drone',
-  'ctl.k8': 'L', 'ctl.d8': 'Switch language: 中文 / English',
+  'ctl.k8': 'L', 'ctl.d8': 'Switch language: 中文 / English / 日本語',
   'ctl.k9': 'Esc · M · R', 'ctl.d9': 'Pause · mute · restart',
   'hud.score': 'SCORE',
   'hud.lives': 'LIVES',
@@ -114,8 +115,69 @@ const en: Record<Key, string> = {
   'cam.drone': 'Drone camera',
 };
 
-export const dict = { zh, en } as const;
+const ja: Record<Key, string> = {
+  title: '料金所ジャンプ',
+  subtitle: 'RDSTR · SpaceX コールドガス推進パッケージ',
+  start: 'Enter キー / クリックでスタート',
+  loading: 'シェーダーを準備中…',
+  'ctl.k0': 'W / ↑', 'ctl.d0': '加速',
+  'ctl.k1': 'S / ↓', 'ctl.d1': 'ブレーキ。空中で長押し = その場でホバリング',
+  'ctl.k2': 'A D / ← →', 'ctl.d2': 'ステアリング',
+  'ctl.k3': 'スペース（長押し）', 'ctl.d3': 'スラスター：上昇・ホバリング。壁の上では離脱',
+  'ctl.k4': 'Shift', 'ctl.d4': '後方ジェットで加速（最高 約 380 km/h）',
+  'ctl.k5': 'F', 'ctl.d5': '吸着 オン / オフ（車に内蔵のファンシステム）',
+  'ctl.k6': 'Q / E', 'ctl.d6': '空中でバレルロール（着地までに回り切ること）',
+  'ctl.k7': 'C', 'ctl.d7': 'カメラ：追従 / サイド / ドローン',
+  'ctl.k8': 'L', 'ctl.d8': '言語切替：中文 / English / 日本語',
+  'ctl.k9': 'Esc · M · R', 'ctl.d9': 'ポーズ · ミュート · リスタート',
+  'hud.score': 'スコア',
+  'hud.lives': 'ライフ',
+  'hud.saved': '浮いた通行料',
+  'hud.sucOn': '吸着 オン',
+  'hud.sucOff': '吸着 オフ',
+  'hud.sucWarn': '吸着オフ / SUCTION OFF',
+  'popup.flyover': '料金所を飛び越えた！¥{0} 浮いた',
+  'popup.jump': 'バーを飛び越えた！¥{0} 踏み倒し',
+  'popup.ram': '強行突破！罰金 ¥{0}',
+  'popup.etc': 'ETC で ¥{0} 支払い',
+  'popup.nearMiss': 'ニアミス +100',
+  'popup.roll': 'バレルロール +500',
+  'popup.crash': 'クラッシュ！',
+  'popup.rollCrash': 'ロール中に着地！',
+  'popup.landing': 'ソフトランディング',
+  'popup.detach': '離脱 · スラスター噴射',
+  'popup.stunt': 'スタント成功 +2500',
+  'popup.suctionOn': '吸着オン',
+  'popup.suctionOff': '吸着オフ',
+  'popup.arenaHint': 'F 吸着 · W 壁を登る · スペース 離脱',
+  'popup.gameOver': '大破',
+  'screen.pauseTitle': 'ポーズ中',
+  'screen.overTitle': 'ゲームオーバー',
+  'screen.resume': '再開',
+  'screen.restart': 'リスタート',
+  'screen.distance': '走行距離',
+  'screen.tolls': '料金所スキップ',
+  'screen.saved': '浮いた通行料',
+  'screen.fines': '罰金',
+  'screen.best': 'ベスト',
+  'screen.score': 'スコア',
+  'screen.stunts': 'スタント',
+  'screen.newBest': '新記録',
+  'screen.hintResume': 'Esc 再開 · R リスタート',
+  'screen.hintRestart': 'R / クリックでリスタート',
+  'cam.chase': '追従カメラ',
+  'cam.side': 'サイドカメラ',
+  'cam.drone': 'ドローンカメラ',
+};
+
+export const dict = { zh, en, ja } as const;
 export type DictKey = Key;
+
+/** The order L and the language button cycle through, the button labels, and the <html lang> value. */
+export const LANGS: readonly Lang[] = ['zh', 'en', 'ja'];
+export const LANG_LABEL: Record<Lang, string> = { zh: '中文', en: 'EN', ja: '日本語' };
+export const HTML_LANG: Record<Lang, string> = { zh: 'zh-CN', en: 'en', ja: 'ja' };
+export const isLang = (v: unknown): v is Lang => LANGS.includes(v as Lang);
 
 /** Bilingual in-world sign text: [Chinese line, English line]. */
 export const SIGNS = {
@@ -132,12 +194,15 @@ export const SIGNS = {
 };
 
 const KEY = 'flying-roadster.lang';
-export const detectLang = (nav: string | undefined): Lang => (nav && nav.toLowerCase().startsWith('zh') ? 'zh' : 'en');
+export const detectLang = (nav: string | undefined): Lang => {
+  const n = (nav ?? '').toLowerCase();
+  return n.startsWith('zh') ? 'zh' : n.startsWith('ja') ? 'ja' : 'en';
+};
 
 function stored(): Lang | null {
   try {
     const v = typeof localStorage !== 'undefined' ? localStorage.getItem(KEY) : null;
-    return v === 'zh' || v === 'en' ? v : null;
+    return isLang(v) ? v : null;
   } catch {
     return null;
   }
@@ -159,7 +224,7 @@ export function setLang(l: Lang): void {
   for (const f of listeners) f();
 }
 
-export const toggleLang = (): Lang => { setLang(lang === 'zh' ? 'en' : 'zh'); return lang; };
+export const toggleLang = (): Lang => { setLang(LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length]); return lang; };
 export const onLang = (f: () => void): void => { listeners.push(f); };
 
 /** Translate a key, filling {0}, {1}... */

@@ -6,7 +6,7 @@
 
 > 非官方粉丝作品，与 Tesla、SpaceX 无关。/ Unofficial fan project, not affiliated with Tesla or SpaceX.
 
-一个 3D 网页驾驶游戏：在夜间高速上驾驶新款 Tesla Roadster，用「SpaceX 冷气推进套件」悬停、飞越车流和收费站（逃费梗）；驶入**特技场匝道**，在独立的特技场里开上弧形墙、从墙顶翻身掉头、悬停降落。界面支持**中文 / English**（按 L 切换）。English section: see below.
+一个 3D 网页驾驶游戏：在夜间高速上驾驶新款 Tesla Roadster，用「SpaceX 冷气推进套件」悬停、飞越车流和收费站（逃费梗）；驶入**特技场匝道**，在独立的特技场里开上弧形墙、从墙顶翻身掉头、悬停降落。界面支持**中文 / English / 日本語**（按 L 切换）。English and 日本語 sections: see below.
 
 技术栈：Vite + TypeScript（strict）+ three.js（WebGLRenderer）。没有物理引擎，街机物理全部自己写；世界、贴图、音频全部程序生成。
 
@@ -34,7 +34,7 @@ npm test           # vitest：src/sim 与 src/ui/i18n 的单元测试
 | F | **吸附（车自带的风扇系统）开 / 关**，HUD 的 G-FORCE 旁始终显示状态和下压力 |
 | Q / E | 空中桶滚（约 0.8 秒转完，**转到一半落地算撞车**） |
 | C | 镜头：追尾 / 侧拍 / 无人机 |
-| L | 切换语言：中文 / English（也可点开始画面右上角的按钮） |
+| L | 切换语言：中文 / English / 日本語（也可点开始画面右上角的按钮） |
 | Esc / M / R | 暂停 / 静音 / 重新开始（一切回到开局：35 km/h、3 条命、¥0；重新开始时还按着的 W / Shift 要松开再按才生效） |
 
 手机上会显示触屏按钮（转向、推进、加速、桶滚）。
@@ -60,7 +60,7 @@ npm test           # vitest：src/sim 与 src/ui/i18n 的单元测试
 - **镜头与后期**：基于 `1 - exp(-k*dt)` 的弹簧追尾镜头（FOV 随速度 60→75，加速时有冲击感），特技时切到能框住整个翻转和降落的侧面镜头；基于 trauma 的震动；EffectComposer（4× MSAA HDR）→ 半分辨率 UnrealBloom → 暗角 / 颗粒 / 随速度增大的色差 → ACES 色调映射。
 - **HUD**：左下 G-FORCE 圆环 + 侧视小车图标，其上方是常驻的吸附状态；右下 ALTITUDE FT 圆环 + 俯视小车图标；底部中间速度与 COPV 气瓶条；顶部得分 / 生命 / 累计逃费；中央弹出文字。HUD 最多 30 Hz 更新，且只在数值变化时写 DOM。
 - **音频**：全部 WebAudio 程序合成（电机啸叫、推进器轰鸣、风声、吸附风扇、撞击、ETC「嘀」）。
-- **双语**：所有界面文字来自一个字典 `src/ui/i18n.ts`（中英各一份，测试检查两边键一致）；默认语言取自 `navigator.language`，L 键或开始画面按钮切换，选择保存在 localStorage。
+- **三种语言**：所有界面文字来自一个字典 `src/ui/i18n.ts`（中、英、日各一份，测试检查键一致）；默认语言取自 `navigator.language`，L 键或开始画面按钮在 中文 → English → 日本語 之间切换，选择保存在 localStorage。路牌保持中英双语。
 
 ## 车模
 
@@ -108,7 +108,7 @@ npm test           # vitest：src/sim 与 src/ui/i18n 的单元测试
 ```
 src/main.ts          游戏循环、状态机、场景切换（高速 / 特技场）、调试接口
 src/config.ts        全部可调参数
-src/ui/i18n.ts       中英文字典（含双语路牌文字），i18n.test.ts 检查键一致
+src/ui/i18n.ts       中英日字典（含中英双语路牌文字），i18n.test.ts 检查键一致
 src/sim/             纯逻辑（不引用 three.js），有单元测试
   vehicle.ts         驱动、转向、重力、推进、气瓶、桶滚、后向喷气、边界、落地缓冲、翻转掉头
   suction.ts         车的吸附系统（开关、抓地、下压力）
@@ -143,7 +143,7 @@ docs/                SPEC.md、CAR_MODEL.md
 
 # English
 
-**RDSTR Toll Jump** is a 3D browser driving game. You drive the new Tesla Roadster down a night highway and use its SpaceX cold-gas thruster package to hover, jump traffic and **fly over toll plazas** (the skip-the-toll-booth meme). Take the **stunt arena exit** to a separate venue: drive up a curved wall, leave its tip upside down, and let the thrusters flip the car upright and turn it around, then hover down and land facing the opposite way. The UI is fully bilingual: press **L** to switch between 中文 and English.
+**RDSTR Toll Jump** is a 3D browser driving game. You drive the new Tesla Roadster down a night highway and use its SpaceX cold-gas thruster package to hover, jump traffic and **fly over toll plazas** (the skip-the-toll-booth meme). Take the **stunt arena exit** to a separate venue: drive up a curved wall, leave its tip upside down, and let the thrusters flip the car upright and turn it around, then hover down and land facing the opposite way. The UI comes in 中文, English and 日本語: press **L** to cycle through them.
 
 Stack: Vite, TypeScript (strict) and three.js. There is no physics engine (the arcade physics is our own code), and the world, textures and audio are all procedural.
 
@@ -157,7 +157,7 @@ npm run preview    # serve the build at http://localhost:4173
 npm test           # vitest: unit tests for src/sim and src/ui/i18n
 ```
 
-Press **Enter** or click to start. `?lang=en` forces English; `?debug` shows fps, frame time and draw calls.
+Press **Enter** or click to start. `?lang=en` (or `zh`, `ja`) forces a language; `?debug` shows fps, frame time and draw calls.
 
 ## Controls
 
@@ -171,7 +171,7 @@ Press **Enter** or click to start. `?lang=en` forces English; `?debug` shows fps
 | F | **Suction on/off**: the car's own underbody fan system. Its state is always shown next to the G-FORCE gauge, with the downforce in kN while it is on |
 | Q / E | Barrel roll in the air (finish it before you land) |
 | C | Camera: chase / side / drone |
-| L | Switch language (中文 / English) |
+| L | Switch language (中文 / English / 日本語) |
 | Esc / M / R | Pause / mute / restart (everything goes back to a fresh start: 35 km/h, 3 lives, ¥0; keys still held at a restart, such as W or Shift, only count again after you let go and press them) |
 
 ## Features
@@ -181,7 +181,7 @@ Press **Enter** or click to start. `?lang=en` forces English; `?debug` shows fps
 - **Toll plazas** every 2 km: 6 wide lanes (5.5 m openings, 1.2 m islands). About half are **ETC lanes** whose booms lift by themselves ("ETC: ¥45 paid", no bonus and no penalty; the normal legal way through); manual lanes keep the boom down (ram it: "Fined ¥200", no life lost). Fly over the canopy roof for the big bonus ("Saved ¥45"), or clear the boom in the air. Hitting a booth or the canopy is a crash; grazing an island curb only deflects the car. All in-world signs carry a Chinese line over an English line.
 - **Thrusters and smoke**: nested additive plume cones, nozzle glare, an under-car light, and a one-draw-call smoke system (about 2,500 depth-sorted particles) that rolls out into big clouds on the road, trails downward in the air and takes a pink tint near the red edge strips. A landing burn fires by itself near the ground.
 - **Traffic is light**: about half the first version's density, Semis are rare, one lane is always clear, and there is no traffic within 150 m before a plaza or before the arena exit.
-- **Bilingual UI**: one dictionary (`src/ui/i18n.ts`, a test checks that both languages have every key). The default comes from `navigator.language`; L or the 中文 / EN button on the start screen switches it and the choice is saved.
+- **Three UI languages**: one dictionary (`src/ui/i18n.ts`, a test checks that every language has every key). The default comes from `navigator.language`; L or the 中文 · EN · 日本語 button on the start screen cycles it and the choice is saved. In-world signs stay Chinese + English.
 - **Car model**: the game loads `public/models/roadster.glb` (see `docs/CAR_MODEL.md`) when it exists and uses the built-in procedural car otherwise. `?car=glb|procedural` forces one.
 
 ## Performance
@@ -191,3 +191,13 @@ Press **Enter** or click to start. `?lang=en` forces English; `?debug` shows fps
 ## Tests and screenshots
 
 `npm test` covers the thrust, gravity and gas step, boost, suction, the wall (staying on, falling off, the tip launch, the flip and the reversed landing), the toll outcomes (ETC, curb deflection, wide lanes), collision, scoring, course layout, traffic rules and i18n parity. `node tools/smoke-test.mjs` (after `npm run preview`) plays the whole loop through real key events. `node tools/restart-check.mjs` restarts with W and Shift still held, from the pause button and from the arena wall, and checks that every time the game is back to a fresh start (`src/sim/run.test.ts` does the same for the sim state). `npm run shots` writes the full screenshot set to `shots/`, which is not committed (the English start screen and HUD are `11-start-en.png` and `11b-hud-en.png`).
+
+---
+
+# 日本語
+
+**料金所ジャンプ（RDSTR Toll Jump）** は、ブラウザで遊べる 3D ドライビングゲームです。新型 Tesla Roadster で夜の高速道路を走り、SpaceX のコールドガス・スラスターでホバリングして、車の列や料金所を飛び越えます（ネットで話題の「料金所を飛び越える」ネタ）。スタントアリーナでは、吸着ファンで曲面の壁を登り、頂上から逆さまに飛び出して空中で姿勢を立て直し、向きを反転して着地します。
+
+- プレイ：<https://ryoshumei.github.io/toll-jump/>
+- 操作：W / S 加速・ブレーキ · A / D ステアリング · スペース スラスター · Shift 後方ジェット · F 吸着 · Q / E バレルロール · C カメラ · L 言語切替（中文 / English / 日本語）
+- 非公式のファン作品です。Tesla、SpaceX とは関係ありません。

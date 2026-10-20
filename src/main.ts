@@ -29,7 +29,7 @@ import { makeAlphaTexture, makeGlowTexture, makePoolTexture } from './render/tex
 import { Traffic } from './render/traffic';
 import { GameAudio } from './ui/audio';
 import { Hud, type HudState } from './ui/hud';
-import { getLang, onLang, setLang, SIGNS, t, toggleLang, type Lang } from './ui/i18n';
+import { getLang, isLang, onLang, setLang, SIGNS, t, toggleLang, type Lang } from './ui/i18n';
 import { Input } from './ui/input';
 import { Screens, type RunStats } from './ui/screens';
 
@@ -41,7 +41,7 @@ const DEBUG = params.has('debug');
 const COMPARE = params.has('compare');
 const CAR_MODE = params.get('car'); // 'glb' | 'procedural' | null (auto-detect)
 const LANG_PARAM = params.get('lang');
-if (LANG_PARAM === 'zh' || LANG_PARAM === 'en') setLang(LANG_PARAM);
+if (isLang(LANG_PARAM)) setLang(LANG_PARAM);
 if (COMPARE) document.body.classList.add('compare');
 
 const canvas = document.getElementById('c') as HTMLCanvasElement;

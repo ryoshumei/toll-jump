@@ -1,5 +1,5 @@
 // Start, pause and game-over screens (DOM). Buttons call back into the game. All text comes from i18n.
-import { t } from './i18n';
+import { getLang, HTML_LANG, LANG_LABEL, LANGS, t } from './i18n';
 
 export interface RunStats {
   score: number;
@@ -34,6 +34,9 @@ export class Screens {
 
   /** Re-apply every label (the language changed). */
   applyLang(): void {
+    // <html lang> picks the right CJK glyphs and the :lang(ja) font stack in index.html
+    document.documentElement.lang = HTML_LANG[getLang()];
+    $('langbtn').innerHTML = LANGS.map((l) => `<span${l === getLang() ? ' class="on"' : ''}>${LANG_LABEL[l]}</span>`).join(' · ');
     $('s-title').textContent = t('title');
     $('s-sub').textContent = t('subtitle');
     $('s-go').textContent = t('start');

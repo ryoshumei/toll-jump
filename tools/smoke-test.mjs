@@ -32,10 +32,13 @@ await wait(() => window.__game.state.z < window.__game.debug.plazaZ(0) - 14, 150
 out.fly = await state(page);
 await page.keyboard.up('Space');
 await page.keyboard.up('KeyW');
-// language key
+// language key cycles 中文 → English → 日本語: from English, one press gives Japanese, the next Chinese
 await page.keyboard.press('KeyL');
 await sleep(150);
 out.lang = (await state(page)).lang;
+await page.keyboard.press('KeyL');
+await sleep(150);
+out.lang2 = (await state(page)).lang;
 // the stunt: suction on, near the tip, drive off it (W), watch the flip and the reversed landing
 await dbg('d.arenaWall(27.5, 0, true)');
 out.onWall = await state(page);
@@ -57,13 +60,13 @@ const r = (s, k) => Object.fromEntries(k.map((x) => [x, typeof s[x] === 'number'
 console.log('drive ', JSON.stringify(r(out.drive, ['place', 'kmh', 'car'])));
 console.log('thrust', JSON.stringify(r(out.thrust, ['y', 'particles', 'calls'])));
 console.log('etc   ', JSON.stringify(r(out.etc, ['etcPasses', 'lives', 'saved', 'fines'])), 'boom lift 60 m out', out.boomFar.etcLift.toFixed(2), '-> 21 m out', out.boomNear.etcLift.toFixed(2));
-console.log('fly   ', JSON.stringify(r(out.fly, ['saved', 'lives'])), 'lang', out.lang);
+console.log('fly   ', JSON.stringify(r(out.fly, ['saved', 'lives'])), 'lang', out.lang, '->', out.lang2);
 console.log('wall  ', JSON.stringify(r(out.onWall, ['place', 'mode', 'y', 'suction'])), 'flip', JSON.stringify(r(out.flipStart, ['pitch', 'roll', 'dir'])), '->', JSON.stringify(r(out.flipEnd, ['pitch', 'dir', 'heading'])));
 console.log('land  ', JSON.stringify(r(out.landed, ['stunts', 'dir', 'grounded', 'z', 'lives'])), '| back', JSON.stringify(r(out.back, ['place', 'dir', 'kmh', 'lives'])));
 const ok = out.drive.kmh > 80 && out.thrust.y > 1 && out.thrust.particles > 50
   && out.boomFar.etcLift < 0.05 && out.boomNear.etcLift > 0.9
   && out.etc.etcPasses === 1 && out.etc.lives === 3 && out.etc.fines === 0
-  && out.fly.saved >= 45 && out.lang === 'zh'
+  && out.fly.saved >= 45 && out.lang === 'ja' && out.lang2 === 'zh'
   && out.onWall.mode === 'wall' && out.flipStart.pitch > 1.7 && out.flipEnd.dir === -1
   && out.landed.stunts === 1 && out.landed.dir === -1 && out.landed.lives === 3
   && out.back.place === 'highway' && out.back.dir === 1 && out.back.kmh > 15;

@@ -1,19 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { detectLang, dict, SIGNS, t } from './i18n';
+import { detectLang, dict, getLang, isLang, LANGS, SIGNS, t, toggleLang } from './i18n';
 
 describe('i18n', () => {
-  it('has every key in both languages, and no empty strings', () => {
+  it('has every key in every language, and no empty strings', () => {
     const zh = Object.keys(dict.zh).sort();
-    const en = Object.keys(dict.en).sort();
-    expect(en).toEqual(zh);
-    for (const l of ['zh', 'en'] as const) {
+    for (const l of LANGS) {
+      expect(Object.keys(dict[l]).sort(), l).toEqual(zh);
       for (const [k, v] of Object.entries(dict[l])) expect(typeof v === 'string' && v.length > 0, `${l}.${k}`).toBe(true);
     }
   });
 
-  it('every placeholder used in one language is used in the other', () => {
+  it('every placeholder used in one language is used in the others', () => {
     const ph = (s: string) => (s.match(/\{\d\}/g) ?? []).sort().join('');
-    for (const k of Object.keys(dict.zh) as (keyof typeof dict.zh)[]) expect(ph(dict.en[k]), k).toBe(ph(dict.zh[k]));
+    for (const k of Object.keys(dict.zh) as (keyof typeof dict.zh)[]) {
+      for (const l of LANGS) expect(ph(dict[l][k]), `${l}.${k}`).toBe(ph(dict.zh[k]));
+    }
   });
 
   it('fills placeholders', () => {
@@ -25,8 +26,23 @@ describe('i18n', () => {
     expect(detectLang('zh-CN')).toBe('zh');
     expect(detectLang('zh-TW')).toBe('zh');
     expect(detectLang('en-US')).toBe('en');
-    expect(detectLang('ja-JP')).toBe('en');
+    expect(detectLang('ja-JP')).toBe('ja');
+    expect(detectLang('ja')).toBe('ja');
+    expect(detectLang('fr-FR')).toBe('en');
     expect(detectLang(undefined)).toBe('en');
+  });
+
+  it('L cycles 中文 → English → 日本語 and back', () => {
+    const start = getLang();
+    const seen = [toggleLang(), toggleLang(), toggleLang()];
+    expect(new Set(seen)).toEqual(new Set(LANGS));
+    expect(getLang()).toBe(start);
+  });
+
+  it('accepts only known language codes (URL parameter, stored choice)', () => {
+    for (const l of LANGS) expect(isLang(l)).toBe(true);
+    expect(isLang('fr')).toBe(false);
+    expect(isLang(null)).toBe(false);
   });
 
   it('in-world signs carry a Chinese line and an English line', () => {

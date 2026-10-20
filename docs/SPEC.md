@@ -121,7 +121,7 @@ The first plaza comes at about 800 m, then one every 2 km.
 | Space (hold) | Thrusters: lift and hover. Drains COPV gas, which refills on the ground. On the suction wall, Space detaches the car instead. |
 | S (in the air, thrusters on) | Brake forward speed, so the car can hover in place like the v2 stage hover |
 | F | Suction (吸附) on/off. This is the car's own system (see "Suction" above). |
-| L | Switch the language between 中文 and English |
+| L | Cycle the language: 中文 → English → 日本語 |
 | Shift | Rear boost jets: a strong forward push, on the road and in the air. Drains gas. |
 | Q / E | Barrel roll while airborne. A roll finishes on its own in about 0.8 s, and landing mid-roll is a crash. |
 | C | Camera: chase / side cinematic / **drone aerial** (like v2) |
@@ -164,9 +164,9 @@ The first plaza comes at about 800 m, then one every 2 km.
 - **Top bar**: score, lives and 累计逃费.
 - **Center popups**: short, punchy text that animates in and out.
 - Use thin white type with tabular numbers. Draw the rings as SVG. Update the HUD at no more than 30 Hz and only when a shown value changes.
-- **Languages: Chinese and English.**
+- **Languages: Chinese, English and Japanese.**
   - All UI text (HUD labels, popups, screens, the controls list and hints) comes from one dictionary, `src/ui/i18n.ts`, with a zh and an en entry for every key. A test checks that both languages have every key.
-  - The default comes from `navigator.language`. L, or a 中文 / EN button on the start screen, switches it. The choice is saved in localStorage, wrapped in try/catch.
+  - The default comes from `navigator.language`. L, or a 中文 · EN · 日本語 button on the start screen, cycles it. The choice is saved in localStorage, wrapped in try/catch.
   - In-world signs carry both languages on the texture, like real Chinese expressway signs: one Chinese line and one English line, for example `火星高速 · 星舰收费站` over `MARS EXPRESSWAY · STARSHIP TOLL STATION`.
   - The README gets an English section.
 - **Start screen**: a homage to `roadster.png`. A dark studio with a soft spotlight pool on the floor, the car slowly turning, title **飞跃收费站**, subtitle "RDSTR · SpaceX 冷气推进套件", a list of the controls, and "按 Enter / 点击 开始".
