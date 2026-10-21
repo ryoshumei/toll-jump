@@ -17,6 +17,26 @@ describe('i18n', () => {
     }
   });
 
+  it('has touch copy for the start, pause and game-over lines: tap wording that names no keyboard key', () => {
+    for (const l of LANGS) {
+      for (const k of ['startTouch', 'screen.hintResumeTouch', 'screen.hintRestartTouch'] as const) {
+        expect(dict[l][k], `${l}.${k}`).not.toMatch(/Enter|Esc|\bR\b|キー|按键/);
+      }
+      expect(dict[l].startTouch, l).not.toBe(dict[l].start);
+      expect(dict[l]['screen.hintResumeTouch'], l).not.toBe(dict[l]['screen.hintResume']);
+      expect(dict[l]['screen.hintRestartTouch'], l).not.toBe(dict[l]['screen.hintRestart']);
+    }
+  });
+
+  it('the touch lines name the real buttons (their labels), so they promise only taps that do something', () => {
+    for (const l of LANGS) {
+      const d = dict[l];
+      expect(d['screen.hintResumeTouch'], `${l} pause`).toContain(d['screen.resume']);
+      expect(d['screen.hintResumeTouch'], `${l} pause`).toContain(d['screen.restart']);
+      expect(d['screen.hintRestartTouch'], `${l} game over`).toContain(d['screen.restart']);
+    }
+  });
+
   it('fills placeholders', () => {
     expect(t('popup.flyover', 45)).toContain('45');
     expect(t('popup.ram', 200)).toContain('200');

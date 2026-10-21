@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { Input, pedals } from './input';
+import { KMH, TOUCH } from '../config';
+import { createEvents, createInput, createVehicle, forwardSpeed, stepVehicle } from '../sim/vehicle';
+import { cruiseThrottle, Input, pedals } from './input';
 
 function setup() {
   const target = new EventTarget();
@@ -49,10 +51,46 @@ describe('keys held across a restart', () => {
 
 describe('pedals', () => {
   it('touch drives by itself, and its brake holds the car on the arena wall', () => {
-    expect(pedals(false, false, true, false)).toEqual([1, 0]); // on the road: drives forward
+    expect(pedals(false, false, true, false)).toEqual([TOUCH.maxThrottle, 0]); // on the road: drives forward, gently
+    expect(pedals(false, false, true, false, TOUCH.cruise)).toEqual([0, 0]); // and stops pushing at the cruise speed
     expect(pedals(false, true, true, false)).toEqual([0, 1]); // on the road: brakes
-    expect(pedals(false, false, true, true)).toEqual([1, 0]); // on the wall: climbs
+    expect(pedals(false, false, true, true, TOUCH.cruise)).toEqual([1, 0]); // on the wall: climbs, whatever the speed
     expect(pedals(false, true, true, true)).toEqual([0, 0]); // on the wall: holds still (no throttle, no descent)
+  });
+
+  it('touch cruises: a gentle launch, then it settles just under the cruise speed', () => {
+    const s = createVehicle();
+    const i = createInput();
+    const ev = createEvents();
+    const world = { halfWidth: () => 10.5 };
+    let t = 0, t100 = 0, peak = 0;
+    for (; t < 30; t += 1 / 60) {
+      [i.throttle, i.brake] = pedals(false, false, true, false, forwardSpeed(s));
+      stepVehicle(s, i, 1 / 60, world, ev);
+      if (!t100 && forwardSpeed(s) >= 100 * KMH) t100 = t;
+      peak = Math.max(peak, forwardSpeed(s));
+    }
+    expect(t100).toBeGreaterThan(3.3); // flooring it takes 2.2 s
+    expect(t100).toBeLessThan(4.5);
+    expect(peak).toBeLessThanOrEqual(TOUCH.cruise);
+    expect(forwardSpeed(s)).toBeGreaterThan(150 * KMH);
+
+    i.boost = true; // BOOST still goes past it
+    for (let k = 0; k < 120; k++) {
+      [i.throttle, i.brake] = pedals(false, false, true, false, forwardSpeed(s));
+      stepVehicle(s, i, 1 / 60, world, ev);
+    }
+    expect(forwardSpeed(s)).toBeGreaterThan(200 * KMH);
+  });
+
+  it('touch throttle eases off toward the cruise speed', () => {
+    expect(cruiseThrottle(0)).toBe(TOUCH.maxThrottle);
+    expect(cruiseThrottle(-5)).toBe(TOUCH.maxThrottle); // rolling back: full launch throttle
+    const mid = cruiseThrottle(TOUCH.cruise - TOUCH.cruiseBand / 4);
+    expect(mid).toBeGreaterThan(0);
+    expect(mid).toBeLessThan(TOUCH.maxThrottle);
+    expect(cruiseThrottle(TOUCH.cruise)).toBe(0);
+    expect(cruiseThrottle(TOUCH.cruise + 20)).toBe(0); // after a boost it coasts back down
   });
 
   it('leave the keyboard as it was, on the road and on the wall', () => {
@@ -64,7 +102,7 @@ describe('pedals', () => {
   });
 
   it('are what Input.poll uses', () => {
-    const { input, down } = setup();
+    const { input, down, up } = setup();
     input.autoThrottle = true;
     input.onWall = true;
     input.poll();
@@ -76,5 +114,9 @@ describe('pedals', () => {
     input.onWall = false;
     input.poll();
     expect([input.throttle, input.brake]).toEqual([0, 1]);
+    up('KeyS');
+    input.fwd = TOUCH.cruise; // the game sets it every frame, like onWall
+    input.poll();
+    expect([input.throttle, input.brake]).toEqual([0, 0]);
   });
 });

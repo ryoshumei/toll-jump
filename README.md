@@ -39,7 +39,7 @@
 | L | Language: 中文 → English → 日本語 |
 | Esc · M · R | Pause · mute · restart |
 
-Press **Enter** or click to start. On phones and tablets the car accelerates by itself, and on-screen buttons steer, brake, fire the thrusters and the boost, roll, and switch suction on and off. On the arena wall, with suction on, hold BRAKE to stop where you are, and let go to keep climbing.
+Press **Enter** or click to start. On phones and tablets the car drives itself up to about 160 km/h (BOOST goes faster), and on-screen buttons steer, brake, fire the thrusters and the boost, roll, and switch suction on and off. On the arena wall, with suction on, hold BRAKE to stop where you are, and let go to keep climbing.
 
 ## Languages
 
@@ -71,7 +71,7 @@ npm test           # unit tests (vitest)
 | `?debug` | fps, frame time, draw calls and triangles in the top left |
 | `?car=glb\|procedural` | Force the Blender car or the built-in procedural car (default: the Blender car, or the procedural one if it fails to load) |
 | `?autostart` | Skip the start screen |
-| `?touch` | Touch mode on a desktop: on-screen buttons, and the car accelerates by itself |
+| `?touch` | Touch mode on a desktop: on-screen buttons, and the car drives itself |
 
 <details>
 <summary><b>How it's made</b></summary>
@@ -111,7 +111,7 @@ src/config.ts   every tunable number
 src/sim/        pure game logic with unit tests: vehicle, suction, wall, toll, collision, score, course
 src/render/     car, thrusters, smoke, road, toll plaza, exit ramp, arena, traffic, post-processing, camera
 src/ui/         HUD, screens, audio, input, i18n
-tools/          Playwright scripts (screenshots, performance, smoke test) and the Blender car script
+tools/          Playwright scripts (screenshots, performance, smoke and phone checks) and the Blender car script
 docs/           SPEC.md (game spec), CAR_MODEL.md (GLB contract), img/ (README screenshots)
 ```
 
@@ -120,9 +120,14 @@ docs/           SPEC.md (game spec), CAR_MODEL.md (GLB contract), img/ (README s
 <details>
 <summary><b>Tests</b></summary>
 
-- `npm test` runs the unit tests: thrust, gravity and gas, hover braking, barrel rolls, suction, the arena wall (sticking, falling off, the launch from the top, the flip and the reversed landing), every toll outcome, collisions and near misses, scoring, the course layout, traffic rules, input (keys held through a restart, the touch pedals) and the i18n dictionary.
+- `npm test` runs the unit tests: thrust, gravity and gas, hover braking, barrel rolls, suction, the arena wall (sticking, falling off, the launch from the top, the flip and the reversed landing), every toll outcome, collisions and near misses, scoring, the course layout, traffic rules, input (keys held through a restart, the touch pedals and cruise speed), camera framing on an upright phone, and the i18n dictionary.
 - `node tools/smoke-test.mjs` (after `npm run preview`) plays the main beats with real key presses (debug teleports set each one up): driving, thrusters, an ETC lane, a plaza flyover, switching languages, the stunt from the top of the wall, and the way back to the highway.
 - `node tools/restart-check.mjs` restarts with keys held, from the pause screen and from the arena wall, and checks that each restart is a fresh start.
+- `node tools/touch-check.mjs` (with `npm run preview` running) plays as a phone at 390×844, 844×300 and 844×390. At each size it checks that no button or gauge overlaps another or the car. It also checks that the prompts say tap, walks the start, pause and game-over screens with real taps, stops the car on the wall, and confirms the picture never stretches.
 - `npm run shots` (after `npm run preview`) writes the full screenshot set to `shots/` (not committed). `SHOT_LANG=en` or `ja` shoots it in that language.
 
 </details>
+
+## License
+
+[MIT](LICENSE). Tesla and SpaceX are trademarks of their respective owners; this license grants no rights to them.

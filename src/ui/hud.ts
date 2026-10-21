@@ -130,7 +130,7 @@ export class Hud {
     el.textContent = text;
     void el.offsetWidth; // restart the CSS animation
     el.classList.add('run');
-    el.style.top = `${(this.popIdx % 2) * 46}px`;
+    el.style.top = `calc(var(--pop-step, 46px) * ${this.popIdx % 2})`; // two slots; a phone's wrapped popups need a taller step
   }
 
   flash(): void {

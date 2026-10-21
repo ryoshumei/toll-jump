@@ -1,4 +1,5 @@
-// Start, pause and game-over screens (DOM). Buttons call back into the game. All text comes from i18n.
+// Start, pause and game-over screens (DOM). Buttons call back into the game. All text comes from i18n. On a touch screen
+// the prompts say "tap" and name the buttons (a tap anywhere starts the game; resume and restart are the buttons).
 import { getLang, HTML_LANG, LANG_LABEL, LANGS, money, t } from './i18n';
 
 export interface RunStats {
@@ -19,9 +20,12 @@ export class Screens {
   private start = $('start');
   private pause = $('pause');
   private over = $('over');
+  private touch: boolean;
 
-  constructor(cb: { onStart(): void; onResume(): void; onRestart(): void; onLang(): void }) {
+  constructor(cb: { onStart(): void; onResume(): void; onRestart(): void; onLang(): void; touch?: boolean }) {
+    this.touch = cb.touch ?? false;
     this.applyLang();
+    this.sync();
     this.start.addEventListener('click', (e) => {
       if ((e.target as HTMLElement).id === 'langbtn') return;
       cb.onStart();
@@ -45,14 +49,14 @@ export class Screens {
     }
     $('s-title').textContent = t('title');
     $('s-sub').textContent = t('subtitle');
-    $('s-go').textContent = t('start');
+    $('s-go').textContent = t(this.touch ? 'startTouch' : 'start');
     $('p-title').textContent = t('screen.pauseTitle');
     $('p-resume').textContent = t('screen.resume');
     $('p-restart').textContent = t('screen.restart');
-    $('p-hint').textContent = t('screen.hintResume');
+    $('p-hint').textContent = t(this.touch ? 'screen.hintResumeTouch' : 'screen.hintResume');
     $('o-title').textContent = t('screen.overTitle');
     $('o-restart').textContent = t('screen.restart');
-    $('o-hint').textContent = t('screen.hintRestart');
+    $('o-hint').textContent = t(this.touch ? 'screen.hintRestartTouch' : 'screen.hintRestart');
     $('o-new').textContent = t('screen.newBest');
     const ctl = $('controls');
     ctl.innerHTML = '';
@@ -83,15 +87,22 @@ export class Screens {
     }
   }
 
+  /** body.screen-open: the touch buttons (and on a phone the HUD) step aside for a full screen (index.html). */
+  private sync(): void {
+    document.body.classList.toggle('screen-open', this.loading.classList.contains('on') || this.anyOpen);
+  }
+
   hideLoading(): void {
     this.loading.classList.remove('on');
+    this.sync();
     setTimeout(() => this.loading.classList.add('hidden'), 600);
   }
 
-  showStart(b: boolean): void { this.start.classList.toggle('on', b); }
+  showStart(b: boolean): void { this.start.classList.toggle('on', b); this.sync(); }
   showPause(b: boolean, s?: RunStats): void {
     if (b && s) this.fill($('p-stats'), s);
     this.pause.classList.toggle('on', b);
+    this.sync();
   }
   showOver(b: boolean, s?: RunStats): void {
     if (b && s) {
@@ -99,6 +110,7 @@ export class Screens {
       $('o-new').classList.toggle('hidden', !s.newBest);
     }
     this.over.classList.toggle('on', b);
+    this.sync();
   }
   get anyOpen(): boolean {
     return this.start.classList.contains('on') || this.pause.classList.contains('on') || this.over.classList.contains('on');

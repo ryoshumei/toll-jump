@@ -129,7 +129,16 @@ The first plaza comes at about 800 m, then one every 2 km.
 | M | Mute |
 | R | Restart |
 
-- Touch buttons for mobile: steer, brake, thrust, boost, roll and a suction toggle that lights up while suction is on. The car accelerates by itself. A touch screen has no "neither pedal" state, so on the arena wall, with suction on, holding brake stops the car where it is (outside touch mode S still descends; the brake lights still show the held brake), and the arena hint names the touch buttons instead of keys.
+- Touch buttons for mobile: steer, brake, thrust, boost, roll and a suction toggle that lights up while suction is on. The car drives itself, gently (0-100 km/h in about 3.9 s instead of 2.2 s), and stops pushing at a cruise speed of 160 km/h (it settles near 157; `TOUCH` in config.ts); BOOST still goes past it and the car coasts back down after. A touch screen has no "neither pedal" state, so on the arena wall, with suction on, holding brake stops the car where it is (outside touch mode S still descends; the brake lights still show the held brake), and the arena hint names the touch buttons instead of keys.
+- Phone layout:
+  - Upright, the HUD runs along the top: the score row, then the G-force ring, speed and altitude, then the suction pill and the COPV bar. The buttons sit in a band at the bottom, clear of the car.
+  - On its side under a browser bar, the visible height is only 280–340 px (Safari, or the X and Xiaohongshu in-app browsers). There the HUD and buttons shrink so nothing is cut off.
+  - The start, pause and game-over screens hide the buttons.
+  - The drawing buffer always matches the canvas's own box. It is re-measured on window and visualViewport resizes, and a ResizeObserver catches box changes that fire neither. So the picture never stretches when browser bars show or hide, the keyboard comes up, or the page is pinch-zoomed.
+  - On its side, the speed readout sits under the car with the COPV bar beside it (touch landscape up to 640 px high), so it never covers the car.
+  - The start, pause and game-over screens give tap prompts instead of key prompts (点击屏幕开始 / Tap to start / タップでスタート). The pause and game-over prompts name the real Resume and Restart buttons, and the key list is hidden on phones.
+  - Upright, the camera gives its design FOV to the narrow side of the screen, capped at 95° vertical. The 28° studio shot gets at least 46° across the width. On the road the camera also backs off 20%, looks half as far ahead, and rises 1 m; any higher and the toll canopy, 4.7 m up, would hide the car. These are full-strength values, reached at an aspect of 0.5 (a phone held upright with no browser bars); they scale down linearly toward a square screen. At full strength every gameplay FOV hits the 95° cap, so speed no longer widens the view; in Safari on an iPhone 15 (393×659) it still widens from 88° to 95°.
+  - From a square screen up, the framing is unchanged (`src/render/fov.ts`).
 - Call `preventDefault` on game keys and clear all keys on window blur.
 - Physics is arcade-style:
   - Gravity is about 1.6 g.
@@ -238,4 +247,4 @@ The first plaza comes at about 800 m, then one every 2 km.
    - The drone cam.
    Compare each one to `refs/` and polish until it is close. Do at least 2 visual polish passes.
 3. A measured fps and frame-time report: the method, the browser, and avg and p95 frame time while driving and while hovering in thick smoke.
-4. A README in English, Chinese and Japanese (`README.md`, `README.zh-CN.md`, `README.ja.md`) with how to play, the controls, the languages, how to run it and how it is built.
+4. A README in English, Chinese and Japanese (`README.md`, `README.zh-CN.md`, `README.ja.md`) with how to play, the controls, the languages, how to run it, how it is built and the license (MIT, in `LICENSE`).

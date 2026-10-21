@@ -53,8 +53,13 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 renderer.info.autoReset = false;
 
-let W = window.innerWidth;
-let H = window.innerHeight;
+/** The size the canvas is shown at, in CSS px. It covers the page (fixed, inset 0), so its box follows the layout viewport
+ *  as the browser toolbars come and go, and the drawing buffer must match that box or the picture is stretched. The visual
+ *  viewport is not the box: it shrinks with the on-screen keyboard and with a pinch zoom. */
+function viewSize(): [number, number] {
+  return [canvas.clientWidth || window.innerWidth, canvas.clientHeight || window.innerHeight]; // a WebView can report 0 before its first layout
+}
+let [W, H] = viewSize();
 let dpr = Math.min(window.devicePixelRatio || 1, Q.dprCap);
 const DPR_MAX = dpr;
 renderer.setPixelRatio(dpr);
@@ -119,7 +124,7 @@ if (TOUCH) { input.attachTouch(document.getElementById('touch')!); document.body
 const audio = new GameAudio();
 audio.unlockOnGesture();
 const hud = new Hud();
-const screens = new Screens({ onStart: () => startGame(), onResume: () => setPaused(false), onRestart: () => startGame(), onLang: () => toggleLang() });
+const screens = new Screens({ onStart: () => startGame(), onResume: () => setPaused(false), onRestart: () => startGame(), onLang: () => toggleLang(), touch: TOUCH });
 onLang(() => { hud.applyLang(); screens.applyLang(); redrawLiveSigns(); });
 
 const fadeEl = document.getElementById('fade')!;
@@ -269,6 +274,7 @@ function resetRun(): void {
   hoverTarget = null;
   input.forceThrust = null;
   input.onWall = false; // the new run starts on the road
+  input.fwd = 0; // and its first poll (releaseHeld, below) must not use the last run's speed
   input.releaseHeld(); // a key still down from the last run (W, Shift) must not drive the new one
   smoke.clear();
   debris.clear();
@@ -748,6 +754,7 @@ function frame(nowMs: number): void {
   renderer.info.reset();
 
   input.onWall = veh.mode === 'wall';
+  input.fwd = forwardSpeed(veh);
   input.poll();
   if (input.anyKey) { audio.start(); input.anyKey = false; }
   if (input.mutePulse) { hud.muted(audio.toggleMute()); }
@@ -865,6 +872,8 @@ const game = {
     },
     suction: (on: boolean) => { suction.on = on; suction.level = on ? 1 : 0; },
     lang: (l: Lang) => setLang(l),
+    popup: (text: string, kind: 'good' | 'bad' | 'info' | 'big' = 'good') => pop(text, kind),
+    gameOver: () => { if (phase === 'playing') gameOver(); },
     /** Jump into the arena right now (no fade). */
     enterArena: () => { if (phase !== 'playing') startGame(); switchPlace('arena', 25); },
     leaveArena: () => switchPlace('highway', 30),
@@ -899,14 +908,18 @@ if (DEBUG) (window as unknown as { __post: Post }).__post = post;
 
 // ------------------------------------------------------------------ boot
 function resize(): void {
-  W = window.innerWidth;
-  H = window.innerHeight;
+  const [w, h] = viewSize();
+  if (w === W && h === H) return; // the window, the visual viewport and the observer usually all report the same change
+  W = w;
+  H = h;
   renderer.setPixelRatio(dpr);
   renderer.setSize(W, H, false);
   post.setSize(W, H, dpr);
   rig.setAspect(W / H);
 }
 window.addEventListener('resize', resize);
+window.visualViewport?.addEventListener('resize', resize); // iOS can show or hide its toolbars with this event and no window one
+if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => resize()).observe(canvas); // the box can also change with no event at all
 
 async function boot(): Promise<void> {
   road.update(0);

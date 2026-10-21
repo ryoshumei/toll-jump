@@ -1,6 +1,7 @@
 {
   "name": "flying-roadster",
   "private": true,
+  "license": "MIT",
   "version": "1.0.0",
   "description": "飞跃收费站 (RDSTR Toll Jump) - a 3D night-highway game with cold-gas thrusters",
   "type": "module",

@@ -3,12 +3,13 @@ import { chromium } from 'playwright-core';
 
 export const BASE = process.env.BASE || 'http://localhost:4173/';
 
-export async function launch({ width = 1600, height = 900, dpr = 1, gpu = true, extra = [] } = {}) {
+export async function launch({ width = 1600, height = 900, dpr = 1, gpu = true, extra = [], touch = false } = {}) {
   const args = [...(gpu
     ? ['--use-angle=metal', '--ignore-gpu-blocklist', '--enable-gpu', '--enable-zero-copy']
     : []), ...extra];
   const browser = await chromium.launch({ headless: true, args });
-  const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: dpr });
+  // touch: a phone (touch events, a coarse pointer, mobile viewport rules), so the game starts in touch mode
+  const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: dpr, ...(touch ? { hasTouch: true, isMobile: true } : {}) });
   const page = await ctx.newPage();
   const logs = [];
   page.on('console', (m) => {

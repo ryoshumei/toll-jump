@@ -1,11 +1,20 @@
 // Keyboard (and optional touch) input. Game keys call preventDefault and every key is cleared on blur.
 
-/** [throttle, brake]. Touch mode drives forward by itself, so it has no "neither pedal" state; on the arena wall its
- *  brake therefore holds the car where it is (with suction on) instead of backing it down. Outside touch mode S still
- *  descends. */
-export function pedals(up: boolean, down: boolean, auto: boolean, onWall: boolean): [number, number] {
+import { TOUCH } from '../config';
+
+/** Touch mode's own throttle at forward speed fwd (m/s): a gentle launch that eases off toward the cruise speed, so a
+ *  phone player is not flooring it to 320 km/h. BOOST still goes past the cruise speed. */
+export function cruiseThrottle(fwd: number): number {
+  return Math.min(TOUCH.maxThrottle, Math.max(0, (TOUCH.cruise - fwd) / TOUCH.cruiseBand));
+}
+
+/** [throttle, brake]. Touch mode drives forward by itself (see cruiseThrottle), so it has no "neither pedal" state; on
+ *  the arena wall it climbs at full throttle, and its brake holds the car where it is (with suction on) instead of
+ *  backing it down. Outside touch mode S still descends. */
+export function pedals(up: boolean, down: boolean, auto: boolean, onWall: boolean, fwd = 0): [number, number] {
   if (auto && onWall && down && !up) return [0, 0];
-  return [up || (auto && !down) ? 1 : 0, down ? 1 : 0];
+  const self = auto && !down ? (onWall ? 1 : cruiseThrottle(fwd)) : 0;
+  return [up ? 1 : self, down ? 1 : 0];
 }
 
 export class Input {
@@ -18,6 +27,7 @@ export class Input {
   forceThrust: boolean | null = null;
   autoThrottle = false; // touch mode drives forward by itself
   onWall = false; // set by the game every frame (see pedals)
+  fwd = 0; // forward speed (m/s), likewise: touch mode cruises (see cruiseThrottle)
 
   // one-frame pulses, consumed by the game
   rollPulse = 0;
@@ -95,7 +105,7 @@ export class Input {
     const t = this.touch;
     const up = this.isDown('KeyW') || this.isDown('ArrowUp');
     const down = this.isDown('KeyS') || this.isDown('ArrowDown') || t.brake;
-    [this.throttle, this.brake] = pedals(up, down, this.autoThrottle, this.onWall);
+    [this.throttle, this.brake] = pedals(up, down, this.autoThrottle, this.onWall, this.fwd);
     this.brakeLight = down ? 1 : 0;
     const l = this.isDown('KeyA') || this.isDown('ArrowLeft') || t.left;
     const r = this.isDown('KeyD') || this.isDown('ArrowRight') || t.right;

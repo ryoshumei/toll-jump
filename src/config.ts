@@ -173,6 +173,12 @@ export const SUCTION = {
   dragK: 1.1,
 };
 
+export const TOUCH = {
+  cruise: 160 * KMH, // touch mode drives itself up to about this speed; BOOST still goes past it
+  cruiseBand: 20 * KMH, // the throttle eases off over the last stretch below the cruise speed
+  maxThrottle: 0.6, // a gentler launch than flooring it: 0-100 km/h in about 3.9 s instead of 2.2 s
+};
+
 export const SCORE = {
   perMeter: 1,
   airPerSecond: 100,
