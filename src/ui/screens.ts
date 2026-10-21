@@ -39,7 +39,7 @@ export class Screens {
     $('langbtn').innerHTML = LANGS.map((l) => `<span${l === getLang() ? ' class="on"' : ''}>${LANG_LABEL[l]}</span>`).join(' · ');
     document.title = getLang() === 'en' ? 'RDSTR Toll Jump' : `${t('title')} · RDSTR Toll Jump`;
     $('loading-text').textContent = t('loading');
-    for (const k of ['brake', 'thrust', 'boost'] as const) {
+    for (const k of ['brake', 'thrust', 'boost', 'suction'] as const) {
       const b = document.querySelector(`#touch [data-t=${k}]`);
       if (b) b.textContent = t(`touch.${k}`);
     }

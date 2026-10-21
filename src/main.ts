@@ -114,7 +114,8 @@ scene.add(blob, headPool, tailPool, boostPool);
 const rig = new CameraRig(W / H);
 const post = new Post(renderer, scene, rig.camera, W, H, dpr, Q.msaa, Q.bloom);
 const input = new Input(window);
-if (params.has('touch') || window.matchMedia('(pointer: coarse)').matches) input.attachTouch(document.getElementById('touch')!);
+const TOUCH = params.has('touch') || window.matchMedia('(pointer: coarse)').matches; // phones and tablets
+if (TOUCH) { input.attachTouch(document.getElementById('touch')!); document.body.classList.add('touch'); }
 const audio = new GameAudio();
 audio.unlockOnGesture();
 const hud = new Hud();
@@ -254,7 +255,7 @@ function stepFade(dt: number): void {
     if (fade.t >= 0.5) {
       fadeEl.style.opacity = '0';
       fade.phase = 0;
-      if (fade.to === 'arena') pop(t('popup.arenaHint'), 'info');
+      if (fade.to === 'arena') pop(t(TOUCH ? 'popup.arenaHintTouch' : 'popup.arenaHint'), 'info');
     }
   }
 }
@@ -267,6 +268,7 @@ function resetRun(): void {
   wheelSpin = 0;
   hoverTarget = null;
   input.forceThrust = null;
+  input.onWall = false; // the new run starts on the road
   input.releaseHeld(); // a key still down from the last run (W, Shift) must not drive the new one
   smoke.clear();
   debris.clear();
@@ -529,7 +531,7 @@ function updateVisuals(dt: number, now: number): void {
   wheelSpin += (fs / CAR.wheelRadius) * dt;
   const model = roadster.model;
   model.setWheels(wheelSpin, veh.steer * 0.42);
-  model.setLights(phase === 'playing' ? input.brake : 0, veh.boostLevel);
+  model.setLights(phase === 'playing' ? input.brakeLight : 0, veh.boostLevel);
 
   const down = onWall ? 0 : Math.max(veh.thrustLevel, veh.burn);
   const stunt = arenaOn && (veh.flipping || (veh.mode === 'free' && !veh.grounded && run.stuntPending));
@@ -565,7 +567,7 @@ function updateVisuals(dt: number, now: number): void {
   (headPool.material as THREE.MeshBasicMaterial).opacity = 0.3 * near;
   tailPool.position.set(veh.x, 0.03, veh.z + 4.5 * d);
   tailPool.scale.set(5, 1, 6);
-  (tailPool.material as THREE.MeshBasicMaterial).opacity = (0.45 + input.brake * 0.55) * near;
+  (tailPool.material as THREE.MeshBasicMaterial).opacity = (0.45 + input.brakeLight * 0.55) * near;
   boostPool.position.set(veh.x, 0.035, veh.z + 13 * d);
   boostPool.scale.set(7, 1, 24);
   (boostPool.material as THREE.MeshBasicMaterial).opacity = 0.75 * veh.boostLevel * Math.max(0.25, near);
@@ -745,6 +747,7 @@ function frame(nowMs: number): void {
   time += dt;
   renderer.info.reset();
 
+  input.onWall = veh.mode === 'wall';
   input.poll();
   if (input.anyKey) { audio.start(); input.anyKey = false; }
   if (input.mutePulse) { hud.muted(audio.toggleMute()); }

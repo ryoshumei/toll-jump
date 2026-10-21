@@ -1,18 +1,23 @@
 // Scripted screenshots of every game state. Usage: node tools/shoot.mjs [name ...]   (no names = all)
 //   names: start start-en drive hover boost exit arena wall stunt etc plaza flyover drone compare
+//   SHOT_LANG=en|ja|zh plays in that language and adds -en / -ja / -zh to the file names (default: zh, no suffix).
+//   README images, docs/img/<lang>/: SHOT_LANG=<lang> node tools/shoot.mjs hover flyover stunt, then 03-hover,
+//   13-flyover and 08-flip-rcs scaled to 1280x720 JPEG as hover.jpg, toll-flyover.jpg and arena-flip.jpg.
 import { launch, open, sleep, state } from './lib.mjs';
 const OUT = new URL('../shots/', import.meta.url).pathname;
+const LANG = process.env.SHOT_LANG || 'zh';
+const SUFFIX = process.env.SHOT_LANG ? '-' + LANG : '';
 const only = process.argv.slice(2);
 const want = (n) => only.length === 0 || only.includes(n);
 const W = Number(process.env.W || 1600), H = Number(process.env.H || 900);
 const { browser, page, logs } = await launch({ width: W, height: H });
 const dbg = (code) => page.evaluate(`(() => { const d = window.__game.debug; ${code} })()`);
 const key = { down: (k) => page.keyboard.down(k), up: (k) => page.keyboard.up(k) };
-const snap = async (name) => { await page.screenshot({ path: OUT + name + '.png' }); const s = await state(page); console.log('shot', name, `z=${s.z.toFixed(0)} y=${s.y.toFixed(1)} ${s.place} ${s.mode} dir=${s.dir} flipT=${s.flipT.toFixed(2)}`); };
+const snap = async (name) => { await page.screenshot({ path: OUT + name + SUFFIX + '.png' }); const s = await state(page); console.log('shot', name, `z=${s.z.toFixed(0)} y=${s.y.toFixed(1)} ${s.place} ${s.mode} dir=${s.dir} flipT=${s.flipT.toFixed(2)}`); };
 const waitFor = (cond, timeout = 15000) => page.waitForFunction(cond, null, { timeout, polling: 20 });
-const Q = (extra = '') => `?autostart&lang=zh${extra}`;
+const Q = (extra = '') => `?autostart&lang=${LANG}${extra}`;
 
-if (want('start')) { await open(page, '?lang=zh'); await sleep(2600); await snap('01-start'); }
+if (want('start')) { await open(page, '?lang=' + LANG); await sleep(2600); await snap('01-start'); }
 if (want('start-en')) { await open(page, '?lang=en'); await sleep(2600); await snap('11-start-en'); }
 
 if (want('drive') || want('hover') || want('boost') || want('drone')) {

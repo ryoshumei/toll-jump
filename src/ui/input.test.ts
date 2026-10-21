@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Input } from './input';
+import { Input, pedals } from './input';
 
 function setup() {
   const target = new EventTarget();
@@ -44,5 +44,37 @@ describe('keys held across a restart', () => {
     expect(input.steer).toBe(0); // D was held through the restart
     down('KeyR');
     expect(input.restartPulse).toBe(true);
+  });
+});
+
+describe('pedals', () => {
+  it('touch drives by itself, and its brake holds the car on the arena wall', () => {
+    expect(pedals(false, false, true, false)).toEqual([1, 0]); // on the road: drives forward
+    expect(pedals(false, true, true, false)).toEqual([0, 1]); // on the road: brakes
+    expect(pedals(false, false, true, true)).toEqual([1, 0]); // on the wall: climbs
+    expect(pedals(false, true, true, true)).toEqual([0, 0]); // on the wall: holds still (no throttle, no descent)
+  });
+
+  it('leave the keyboard as it was, on the road and on the wall', () => {
+    for (const onWall of [false, true]) {
+      expect(pedals(true, false, false, onWall)).toEqual([1, 0]);
+      expect(pedals(false, true, false, onWall)).toEqual([0, 1]); // S still descends the wall
+      expect(pedals(false, false, false, onWall)).toEqual([0, 0]);
+    }
+  });
+
+  it('are what Input.poll uses', () => {
+    const { input, down } = setup();
+    input.autoThrottle = true;
+    input.onWall = true;
+    input.poll();
+    expect([input.throttle, input.brake]).toEqual([1, 0]);
+    down('KeyS'); // the same brake signal the touch button gives
+    input.poll();
+    expect([input.throttle, input.brake]).toEqual([0, 0]);
+    expect(input.brakeLight).toBe(1); // the brake lights still show it
+    input.onWall = false;
+    input.poll();
+    expect([input.throttle, input.brake]).toEqual([0, 1]);
   });
 });

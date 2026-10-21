@@ -113,13 +113,19 @@
   #debug { position: fixed; left: 8px; top: 8px; font: 11px/1.4 ui-monospace, Menlo, monospace; color: #7dff9b; background: rgba(0,0,0,.55); padding: 6px 9px; white-space: pre; pointer-events: none; z-index: 20; }
   #touch { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
   #touch button { position: absolute; pointer-events: auto; width: 64px; height: 64px; border-radius: 50%; border: 1px solid rgba(255,255,255,.4); background: rgba(255,255,255,.08);
-    color: #fff; font-size: 18px; touch-action: none; font-family: inherit; }
+    color: #fff; font-size: 18px; touch-action: none; font-family: inherit; padding: 0; }
   #touch button.on { background: rgba(255,255,255,.3); }
-  #touch [data-t=left] { left: 18px; bottom: 140px; } #touch [data-t=right] { left: 96px; bottom: 140px; }
-  #touch [data-t=brake] { left: 18px; bottom: 214px; width: 52px; height: 52px; font-size: 13px; }
+  /* the left cluster sits above the suction status pill (which is above the G-FORCE ring) */
+  #touch [data-t=left] { left: 18px; bottom: 172px; } #touch [data-t=right] { left: 96px; bottom: 172px; }
+  #touch [data-t=brake] { left: 18px; bottom: 246px; width: 52px; height: 52px; font-size: 13px; }
   #touch [data-t=thrust] { right: 18px; bottom: 140px; width: 76px; height: 76px; border-color: rgba(159,216,255,.8); }
   #touch [data-t=boost] { right: 104px; bottom: 140px; }
   #touch [data-t=rollL] { right: 104px; bottom: 214px; width: 52px; height: 52px; } #touch [data-t=rollR] { right: 18px; bottom: 228px; width: 52px; height: 52px; }
+  #touch [data-t=suction] { left: 82px; bottom: 246px; width: 56px; height: 56px; font-size: 13px; }
+  #touch [data-t=suction]:lang(en) { font-size: 10px; } #touch [data-t=boost]:lang(en) { font-size: 15px; } /* long English labels */
+  #touch button.lit { color: var(--cyan); border-color: rgba(159,216,255,.9); background: rgba(40,90,130,.35); box-shadow: 0 0 12px rgba(159,216,255,.45); }
+  body.touch #suc kbd { display: none; } /* no F key on a touch screen */
+  @media (max-width: 600px) { .pop.info { white-space: normal; padding: 0 16px; } } /* the touch hints are longer */
 </style>
 </head>
 <body>
@@ -195,7 +201,7 @@
 <div id="fade"><div class="c1"></div><div class="c2"></div></div>
 
 <div id="touch" hidden>
-  <button data-t="left">◀</button><button data-t="right">▶</button><button data-t="brake">刹</button>
+  <button data-t="left">◀</button><button data-t="right">▶</button><button data-t="brake">刹</button><button data-t="suction">吸</button>
   <button data-t="thrust">推</button><button data-t="boost">冲</button><button data-t="rollL">⟲</button><button data-t="rollR">⟳</button>
 </div>
 <div id="debug" class="hidden"></div>

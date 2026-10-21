@@ -1,12 +1,23 @@
 // Keyboard (and optional touch) input. Game keys call preventDefault and every key is cleared on blur.
+
+/** [throttle, brake]. Touch mode drives forward by itself, so it has no "neither pedal" state; on the arena wall its
+ *  brake therefore holds the car where it is (with suction on) instead of backing it down. Outside touch mode S still
+ *  descends. */
+export function pedals(up: boolean, down: boolean, auto: boolean, onWall: boolean): [number, number] {
+  if (auto && onWall && down && !up) return [0, 0];
+  return [up || (auto && !down) ? 1 : 0, down ? 1 : 0];
+}
+
 export class Input {
   throttle = 0;
   brake = 0;
+  brakeLight = 0; // the brake pedal itself: lit even while a touch brake holds the car on the wall (brake = 0)
   steer = 0;
   boost = false;
   /** Debug override for the thrusters (null = follow the keyboard). */
   forceThrust: boolean | null = null;
   autoThrottle = false; // touch mode drives forward by itself
+  onWall = false; // set by the game every frame (see pedals)
 
   // one-frame pulses, consumed by the game
   rollPulse = 0;
@@ -84,8 +95,8 @@ export class Input {
     const t = this.touch;
     const up = this.isDown('KeyW') || this.isDown('ArrowUp');
     const down = this.isDown('KeyS') || this.isDown('ArrowDown') || t.brake;
-    this.throttle = up || (this.autoThrottle && !down) ? 1 : 0;
-    this.brake = down ? 1 : 0;
+    [this.throttle, this.brake] = pedals(up, down, this.autoThrottle, this.onWall);
+    this.brakeLight = down ? 1 : 0;
     const l = this.isDown('KeyA') || this.isDown('ArrowLeft') || t.left;
     const r = this.isDown('KeyD') || this.isDown('ArrowRight') || t.right;
     this.steer = (r ? 1 : 0) - (l ? 1 : 0);
@@ -135,6 +146,7 @@ export class Input {
     bind('thrust', () => { this.touch.thrust = true; this.detachPulse = true; }, () => (this.touch.thrust = false));
     bind('boost', () => (this.touch.boost = true), () => (this.touch.boost = false));
     bind('brake', () => (this.touch.brake = true), () => (this.touch.brake = false));
+    bind('suction', () => (this.suctionPulse = true), () => {});
     bind('rollL', () => (this.rollPulse = -1), () => {});
     bind('rollR', () => (this.rollPulse = 1), () => {});
   }

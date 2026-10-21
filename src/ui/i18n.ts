@@ -39,6 +39,7 @@ const zh = {
   'popup.suctionOn': '吸附已开启',
   'popup.suctionOff': '吸附已关闭',
   'popup.arenaHint': '按 F 开启吸附 · W 上墙 · 空格脱离',
+  'popup.arenaHintTouch': '点「吸」开启吸附 · 按住「刹」停在墙上 · 点「推」脱离',
   'popup.gameOver': '车毁人亡',
   'screen.pauseTitle': '已暂停',
   'screen.overTitle': '游戏结束',
@@ -60,6 +61,7 @@ const zh = {
   'touch.brake': '刹',
   'touch.thrust': '推',
   'touch.boost': '冲',
+  'touch.suction': '吸',
 } as const;
 
 type Key = keyof typeof zh;
@@ -99,6 +101,7 @@ const en: Record<Key, string> = {
   'popup.suctionOn': 'Suction on',
   'popup.suctionOff': 'Suction off',
   'popup.arenaHint': 'F suction · W climb · Space detach',
+  'popup.arenaHintTouch': 'Tap SUCTION · hold BRAKE to stop on the wall · tap LIFT to detach',
   'popup.gameOver': 'Wrecked',
   'screen.pauseTitle': 'PAUSED',
   'screen.overTitle': 'GAME OVER',
@@ -120,6 +123,7 @@ const en: Record<Key, string> = {
   'touch.brake': 'BRAKE',
   'touch.thrust': 'LIFT',
   'touch.boost': 'BOOST',
+  'touch.suction': 'SUCTION',
 };
 
 const ja: Record<Key, string> = {
@@ -157,6 +161,7 @@ const ja: Record<Key, string> = {
   'popup.suctionOn': '吸着オン',
   'popup.suctionOff': '吸着オフ',
   'popup.arenaHint': 'F 吸着 · W 壁を登る · スペース 離脱',
+  'popup.arenaHintTouch': '「吸着」でオン · 「減速」長押しで壁に停止 · 「噴射」で離脱',
   'popup.gameOver': '大破',
   'screen.pauseTitle': 'ポーズ中',
   'screen.overTitle': 'ゲームオーバー',
@@ -178,6 +183,7 @@ const ja: Record<Key, string> = {
   'touch.brake': '減速',
   'touch.thrust': '噴射',
   'touch.boost': '加速',
+  'touch.suction': '吸着',
 };
 
 export const dict = { zh, en, ja } as const;

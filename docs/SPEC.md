@@ -129,7 +129,7 @@ The first plaza comes at about 800 m, then one every 2 km.
 | M | Mute |
 | R | Restart |
 
-- Touch buttons for mobile: steer, thrust, boost and roll.
+- Touch buttons for mobile: steer, brake, thrust, boost, roll and a suction toggle that lights up while suction is on. The car accelerates by itself. A touch screen has no "neither pedal" state, so on the arena wall, with suction on, holding brake stops the car where it is (outside touch mode S still descends; the brake lights still show the held brake), and the arena hint names the touch buttons instead of keys.
 - Call `preventDefault` on game keys and clear all keys on window blur.
 - Physics is arcade-style:
   - Gravity is about 1.6 g.
@@ -165,10 +165,10 @@ The first plaza comes at about 800 m, then one every 2 km.
 - **Center popups**: short, punchy text that animates in and out.
 - Use thin white type with tabular numbers. Draw the rings as SVG. Update the HUD at no more than 30 Hz and only when a shown value changes.
 - **Languages: Chinese, English and Japanese.**
-  - All UI text (HUD labels, popups, screens, the controls list and hints) comes from one dictionary, `src/ui/i18n.ts`, with a zh and an en entry for every key. A test checks that both languages have every key.
+  - All UI text (HUD labels, popups, screens, the controls list and hints) comes from one dictionary, `src/ui/i18n.ts`, with a zh, an en and a ja entry for every key. A test checks that every language has every key.
   - The default comes from `navigator.language`. L, or a 中文 · EN · 日本語 button on the start screen, cycles it. The choice is saved in localStorage, wrapped in try/catch.
-  - In-world signs carry both languages on the texture, like real Chinese expressway signs: one Chinese line and one English line, for example `火星高速 · 星舰收费站` over `MARS EXPRESSWAY · STARSHIP TOLL STATION`. When the UI is Japanese, the Chinese line becomes Japanese (`火星高速 · スターシップ料金所`), and the signs are redrawn as soon as the language changes. The Japanese UI also shows money in yen (the game's yuan × 20, so the first plaza costs 900円).
-  - The README gets an English section.
+  - In-world signs carry both languages on the texture, like real Chinese expressway signs: one Chinese line and one English line, for example `火星高速 · 星舰收费站` over `MARS EXPRESSWAY · STARSHIP TOLL STATION`. When the UI is Japanese, the Chinese line becomes Japanese (`火星高速道路 · スターシップ料金所`), and the signs are redrawn as soon as the language changes. The Japanese UI also shows money in yen (the game's yuan × 20, so the first plaza costs 900円).
+  - The README comes in the same three languages: `README.md` (English, GitHub's default), `README.zh-CN.md` and `README.ja.md`. Each opens with a language bar that links the other two, shows screenshots taken in its own language (`docs/img/<lang>/`), and links to the game with `?lang=` so it opens in that language.
 - **Start screen**: a homage to `roadster.png`. A dark studio with a soft spotlight pool on the floor, the car slowly turning, title **飞跃收费站**, subtitle "RDSTR · SpaceX 冷气推进套件", a list of the controls, and "按 Enter / 点击 开始".
 - **Pause screen** and **game-over screen**: show distance, tolls skipped, ¥ saved and the best score, with a restart button.
 - **Procedural WebAudio**, started on the first user gesture:
@@ -238,4 +238,4 @@ The first plaza comes at about 800 m, then one every 2 km.
    - The drone cam.
    Compare each one to `refs/` and polish until it is close. Do at least 2 visual polish passes.
 3. A measured fps and frame-time report: the method, the browser, and avg and p95 frame time while driving and while hovering in thick smoke.
-4. A Chinese `README.md` with how to run, the controls and the features.
+4. A README in English, Chinese and Japanese (`README.md`, `README.zh-CN.md`, `README.ja.md`) with how to play, the controls, the languages, how to run it and how it is built.

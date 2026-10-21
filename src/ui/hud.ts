@@ -39,6 +39,7 @@ export class Hud {
   private suc = $('suc');
   private sucT = $('suc-t');
   private sucKn = $('suc-kn');
+  private sucBtn = document.querySelector<HTMLElement>('#touch [data-t=suction]'); // lit while suction is on
   private warn = $('sucwarn');
   private flashEl = $('flash');
   private camtag = $('camtag');
@@ -112,6 +113,7 @@ export class Hud {
       this.suc.classList.toggle('on', s.sucOn);
       this.sucT.textContent = s.sucOn ? t('hud.sucOn') : t('hud.sucOff');
       this.sucKn.style.display = s.sucOn ? '' : 'none';
+      this.sucBtn?.classList.toggle('lit', s.sucOn);
       l.kn = -1;
     }
     if (s.sucOn) {
